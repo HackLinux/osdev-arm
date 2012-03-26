@@ -1,0 +1,168 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD .obj/main.o
+LOAD .obj/print.o
+LOAD .obj/syscall.o
+LOAD .obj/uart.o
+LOAD .obj/unwind.o
+LOAD .obj/idt.o
+LOAD .obj/lib1funcs.o
+LOAD .obj/startup.o
+                0x00000000                . = 0x0
+
+.idt            0x00000000       0x4c
+ .obj/idt.o(.text)
+ .text          0x00000000       0x4c .obj/idt.o
+                0x00010000                . = 0x10000
+
+.startup        0x00010000       0x4c
+ .obj/startup.o(.text)
+ .text          0x00010000       0x4c .obj/startup.o
+                0x00010000                _reset
+
+.text           0x0001004c      0xe34
+ *(.text)
+ .text          0x0001004c       0x70 .obj/main.o
+                0x0001004c                main
+                0x0001007c                msg
+                0x00010094                screwed_up
+ .text          0x000100bc      0x9c0 .obj/print.o
+                0x00010304                get_log_level
+                0x00010478                printk
+ .text          0x00010a7c       0x70 .obj/syscall.o
+                0x00010a7c                syscall
+                0x00010ad4                __div0
+ .text          0x00010aec       0x58 .obj/uart.o
+                0x00010aec                console_write
+ .text          0x00010b44       0x3c .obj/unwind.o
+                0x00010b44                __aeabi_unwind_cpp_pr0
+                0x00010b58                __aeabi_unwind_cpp_pr1
+                0x00010b6c                __aeabi_unwind_cpp_pr2
+ .text          0x00010b80      0x300 .obj/lib1funcs.o
+                0x00010b80                __udivsi3
+                0x00010b80                __aeabi_uidiv
+                0x00010c1c                __umodsi3
+                0x00010cbc                __aeabi_idiv
+                0x00010cbc                __divsi3
+                0x00010d88                __modsi3
+                0x00010e40                __aeabi_uidivmod
+                0x00010e58                __aeabi_idivmod
+
+.rodata         0x00010e80       0xb0
+ .rodata        0x00010e80       0x48 .obj/main.o
+ .rodata        0x00010ec8       0x20 .obj/print.o
+ .rodata        0x00010ee8       0x44 .obj/syscall.o
+ .rodata        0x00010f2c        0x4 .obj/uart.o
+                0x00010f2c                out_addr
+
+.ARM.extab      0x00010f30       0x54
+ .ARM.extab     0x00010f30       0x24 .obj/main.o
+ .ARM.extab     0x00010f54       0x18 .obj/print.o
+ .ARM.extab     0x00010f6c       0x18 .obj/syscall.o
+ .ARM.extab     0x00010f84        0x0 .obj/uart.o
+ .ARM.extab     0x00010f84        0x0 .obj/unwind.o
+
+.ARM.exidx      0x00010f84       0x50
+ .ARM.exidx     0x00010f84       0x18 .obj/main.o
+ .ARM.exidx     0x00010f9c       0x18 .obj/print.o
+                                 0x28 (size before relaxing)
+ .ARM.exidx     0x00010fb4       0x10 .obj/syscall.o
+ .ARM.exidx     0x00010fc4        0x8 .obj/uart.o
+ .ARM.exidx     0x00010fcc        0x8 .obj/unwind.o
+                                 0x18 (size before relaxing)
+
+.eh_frame_hdr   0x00010fd4        0x0
+ .eh_frame_hdr  0x00000000        0x0 .obj/startup.o
+
+.glue_7         0x00010fd4        0x0
+ .glue_7        0x00000000        0x0 linker stubs
+
+.glue_7t        0x00010fd4        0x0
+ .glue_7t       0x00000000        0x0 linker stubs
+
+.vfp11_veneer   0x00010fd4        0x0
+ .vfp11_veneer  0x00000000        0x0 linker stubs
+
+.v4_bx          0x00010fd4        0x0
+ .v4_bx         0x00000000        0x0 linker stubs
+
+.iplt           0x00010fd4        0x0
+ .iplt          0x00000000        0x0 .obj/main.o
+
+.rel.dyn        0x00010fd4        0x0
+ .rel.iplt      0x00000000        0x0 .obj/main.o
+
+.data           0x00010fd4      0x404
+ *(.data)
+ .data          0x00010fd4        0x0 .obj/main.o
+ .data          0x00010fd4      0x404 .obj/print.o
+ .data          0x000113d8        0x0 .obj/syscall.o
+ .data          0x000113d8        0x0 .obj/uart.o
+ .data          0x000113d8        0x0 .obj/unwind.o
+ .data          0x000113d8        0x0 .obj/idt.o
+ .data          0x000113d8        0x0 .obj/lib1funcs.o
+ .data          0x000113d8        0x0 .obj/startup.o
+
+.igot.plt       0x000113d8        0x0
+ .igot.plt      0x00000000        0x0 .obj/main.o
+
+.bss            0x000113d8        0x0
+ *(.bss)
+ .bss           0x000113d8        0x0 .obj/main.o
+ .bss           0x000113d8        0x0 .obj/print.o
+ .bss           0x000113d8        0x0 .obj/syscall.o
+ .bss           0x000113d8        0x0 .obj/uart.o
+ .bss           0x000113d8        0x0 .obj/unwind.o
+ .bss           0x000113d8        0x0 .obj/idt.o
+ .bss           0x000113d8        0x0 .obj/lib1funcs.o
+ .bss           0x000113d8        0x0 .obj/startup.o
+                0x000113d8                . = ALIGN (0x4)
+                0x002113d8                . = (. + 0x200000)
+                0x002113d8                stack_top = .
+OUTPUT(final elf32-littlearm)
+
+.comment        0x00000000       0x30
+ .comment       0x00000000       0x30 .obj/main.o
+                                 0x31 (size before relaxing)
+ .comment       0x00000000       0x31 .obj/print.o
+ .comment       0x00000000       0x31 .obj/syscall.o
+ .comment       0x00000000       0x31 .obj/uart.o
+ .comment       0x00000000       0x31 .obj/unwind.o
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 .obj/main.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/print.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/syscall.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/uart.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/unwind.o
+
+.ARM.attributes
+                0x00000000       0x32
+ .ARM.attributes
+                0x00000000       0x34 .obj/main.o
+ .ARM.attributes
+                0x00000034       0x34 .obj/print.o
+ .ARM.attributes
+                0x00000068       0x34 .obj/syscall.o
+ .ARM.attributes
+                0x0000009c       0x34 .obj/uart.o
+ .ARM.attributes
+                0x000000d0       0x34 .obj/unwind.o
+ .ARM.attributes
+                0x00000104       0x24 .obj/idt.o
+ .ARM.attributes
+                0x00000128       0x24 .obj/lib1funcs.o
+ .ARM.attributes
+                0x0000014c       0x24 .obj/startup.o

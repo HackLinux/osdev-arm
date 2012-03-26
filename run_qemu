@@ -1,0 +1,2 @@
+#qemu-system-arm -M versatilepb -kernel $1 -serial udp::4555@4556
+qemu-system-arm -M versatilepb -serial udp:127.0.0.1:4555  -nographic -kernel $1

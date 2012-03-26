@@ -1,0 +1,1 @@
+qemu-arm   -L /opt/compilers/arm/arm-none-linux-gnueabi/libc/ $1 

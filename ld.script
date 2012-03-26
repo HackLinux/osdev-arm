@@ -1,0 +1,16 @@
+ENTRY(_reset)
+
+SECTIONS 
+{
+. = 0;
+.idt . : {.obj/idt.o(.text)}
+. = 0x10000;
+.startup . : {.obj/startup.o(.text)}
+.text	: {*(.text)}
+.data	: {*(.data)}
+.bss	: {*(.bss)}
+.	= ALIGN(4);
+
+.      = . + 0x200000;	/*2 MB */
+stack_top = .;
+}

@@ -3,12 +3,34 @@ ENTRY(_reset)
 SECTIONS 
 {
 . = 0;
-.idt . : {.obj/idt.o(.text)}
+.idt : {.obj/exception.o(.text)}
 . = 0x10000;
-.startup . : {.obj/startup.o(.text)}
-.text	: {*(.text)}
-.data	: {*(.data)}
-.bss	: {*(.bss)}
+.start : {.obj/startup.o(.text)}
+
+
+.text	: 
+{
+text_start = .;
+*(.text)
+text_end   = .;
+}
+
+
+.data	: 
+{
+data_start = .;
+*(.data)
+data_end = .;
+}
+
+
+.bss	: 
+{
+bss_start = .;
+*(.bss)
+bss_end   = .;
+}
+
 .	= ALIGN(4);
 
 .      = . + 0x200000;	/*2 MB */

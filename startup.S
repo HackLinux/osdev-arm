@@ -3,6 +3,7 @@
 
 _reset:
 	bl setup_stacks
+	bl enable_vic
 	bl main
 	b .
 
@@ -11,20 +12,16 @@ _reset:
 setup_stacks:
 	mov sp, #SVC_STACK		/*r13_svc (Supervisor mode)*/
 
-	mov r2, #IRQ_MDMASK
-	msr cpsr_c, r2			/*switch to irq mode*/
+	msr cpsr_c, #IRQ_MDMASK		/*switch to irq mode*/
 	mov sp, #IRQ_STACK		/*r13_irq */
-
 	
-	mov r2, #FIRQ_MDMASK
-	msr cpsr_c, r2			/*switch to fast irq mode*/
+	msr cpsr_c, #FIRQ_MDMASK	/*switch to fast irq mode*/
 	mov sp, #FIQ_STACK		/*r13_fiq*/	
 
 	
 	msr cpsr_c, #ABRT_MD		/*switch to abort mode*/
 	mov sp, #ABRT_STACK		/*r13_abrt*/
 
-	
 	msr cpsr_c, #UND_MD 		/*switch to undefined mode*/
 	mov sp, #UND_STACK		/*r13_und*/
 	
@@ -56,6 +53,6 @@ dump:
 .equ USR_MD	 , 0x10
 
 .equ IRQ_MDMASK  , 0xd2
-.equ FIRQ_MDMASK  , 0xd1
+.equ FIRQ_MDMASK , 0xd1
 
 

@@ -41,7 +41,12 @@ reserved_vec:
 	b reserved_vec
 
 irq_vec:
-	b irq_vec
+	bl fiq_handler
 
 fiq_vec:
 	b fiq_vec
+	bl fiq_handler
+
+.data
+STRING_IDT:
+.string "string data in idt"

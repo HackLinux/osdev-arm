@@ -3,7 +3,6 @@
 
 _reset:
 	bl setup_stacks
-	bl enable_vic
 	bl main
 	b .
 
@@ -33,7 +32,8 @@ setup_stacks:
 
 
 dump:
-	bl screwed_up
+	mov r0, #1
+	bl dump_cpsr
 
 .equ STACK_SIZE, 0x1000
 .equ BASE_STACK, 0x20000

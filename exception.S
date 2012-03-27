@@ -1,5 +1,4 @@
 .text 
-
 reset:
 	b reset_vec
 undefined:
@@ -34,19 +33,17 @@ abort_data_vec:
 	b abort_data_vec
 
 abort_prefetch_vec:
-	bl screwed_up
 	b abort_prefetch_vec
 
 reserved_vec:
 	b reserved_vec
 
 irq_vec:
-	bl fiq_handler
+	b irq_handler
 
 fiq_vec:
-	b fiq_vec
+	subs lr, lr, #4
+	stmfd sp!, {r0-r3, lr}
 	bl fiq_handler
-
-.data
-STRING_IDT:
-.string "string data in idt"
+	ldmfd sp!, {r0-r3, pc}^ 
+	mov pc, sp

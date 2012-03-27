@@ -8,6 +8,8 @@ Linker script and memory map
 
 LOAD .obj/fiq.o
 LOAD .obj/funcs.o
+LOAD .obj/interrupt.o
+LOAD .obj/irq.o
 LOAD .obj/main.o
 LOAD .obj/print.o
 LOAD .obj/syscall.o
@@ -19,9 +21,9 @@ LOAD .obj/lib1funcs.o
 LOAD .obj/startup.o
                 0x00000000                . = 0x0
 
-.idt            0x00000000       0x50
+.idt            0x00000000       0x58
  .obj/exception.o(.text)
- .text          0x00000000       0x50 .obj/exception.o
+ .text          0x00000000       0x58 .obj/exception.o
                 0x00010000                . = 0x10000
 
 .start          0x00010000       0x48
@@ -29,146 +31,163 @@ LOAD .obj/startup.o
  .text          0x00010000       0x48 .obj/startup.o
                 0x00010000                _reset
 
-.text           0x00010048     0x1260
+.text           0x00010048     0x12b8
                 0x00010048                text_start = .
  *(.text)
- .text          0x00010048       0x1c .obj/fiq.o
-                0x00010048                fiq_handler
- .text          0x00010064      0x344 .obj/funcs.o
-                0x00010064                memset
-                0x000100d4                strncpy
-                0x00010150                memcpy
-                0x000101dc                memcmp
-                0x000102b0                strncmp
-                0x00010384                panic
- .text          0x000103a8      0x100 .obj/main.o
-                0x000103a8                dump_cpsr
-                0x000103d4                init_bss
-                0x00010420                main
-                0x00010468                msg
-                0x00010480                screwed_up
- .text          0x000104a8      0x9c0 .obj/print.o
-                0x000106f0                get_log_level
-                0x00010864                printk
- .text          0x00010e68       0x64 .obj/syscall.o
-                0x00010e68                syscall
-                0x00010eb4                __div0
- .text          0x00010ecc       0x58 .obj/uart.o
-                0x00010ecc                console_write
- .text          0x00010f24       0x3c .obj/unwind.o
-                0x00010f24                __aeabi_unwind_cpp_pr0
-                0x00010f38                __aeabi_unwind_cpp_pr1
-                0x00010f4c                __aeabi_unwind_cpp_pr2
- .text          0x00010f60       0x48 .obj/intr.o
-                0x00010f60                enable_vic
-                0x00010f94                gen_soft_irq
- .text          0x00010fa8      0x300 .obj/lib1funcs.o
-                0x00010fa8                __udivsi3
-                0x00010fa8                __aeabi_uidiv
-                0x00011044                __umodsi3
-                0x000110e4                __aeabi_idiv
-                0x000110e4                __divsi3
-                0x000111b0                __modsi3
-                0x00011268                __aeabi_uidivmod
-                0x00011280                __aeabi_idivmod
-                0x000112a8                text_end = .
+ .text          0x00010048       0x28 .obj/fiq.o
+                0x00010048                fiq_handle
+ .text          0x00010070      0x344 .obj/funcs.o
+                0x00010070                memset
+                0x000100e0                strncpy
+                0x0001015c                memcpy
+                0x000101e8                memcmp
+                0x000102bc                strncmp
+                0x00010390                panic
+ .text          0x000103b4       0x14 .obj/interrupt.o
+                0x000103b4                enable_vic
+ .text          0x000103c8       0x1c .obj/irq.o
+                0x000103c8                irq_handle
+ .text          0x000103e4       0xc8 .obj/main.o
+                0x000103e4                dump_cpsr
+                0x00010418                init_bss
+                0x00010464                main
+                0x00010494                msg
+ .text          0x000104ac      0x9c0 .obj/print.o
+                0x000106f4                get_log_level
+                0x00010868                printk
+ .text          0x00010e6c       0x64 .obj/syscall.o
+                0x00010e6c                syscall
+                0x00010eb8                __div0
+ .text          0x00010ed0       0x58 .obj/uart.o
+                0x00010ed0                console_write
+ .text          0x00010f28       0x3c .obj/unwind.o
+                0x00010f28                __aeabi_unwind_cpp_pr0
+                0x00010f3c                __aeabi_unwind_cpp_pr1
+                0x00010f50                __aeabi_unwind_cpp_pr2
+ .text          0x00010f64       0x9c .obj/intr.o
+                0x00010f64                enable_irq
+                0x00010f94                enable_fiq
+                0x00010fbc                gen_soft_irq
+                0x00010fcc                fiq_handler
+                0x00010fe4                irq_handler
+ .text          0x00011000      0x300 .obj/lib1funcs.o
+                0x00011000                __udivsi3
+                0x00011000                __aeabi_uidiv
+                0x0001109c                __umodsi3
+                0x0001113c                __aeabi_idiv
+                0x0001113c                __divsi3
+                0x00011208                __modsi3
+                0x000112c0                __aeabi_uidivmod
+                0x000112d8                __aeabi_idivmod
+                0x00011300                text_end = .
 
-.rodata         0x000112a8       0xec
- .rodata        0x000112a8       0x10 .obj/fiq.o
- .rodata        0x000112b8        0x4 .obj/funcs.o
- .rodata        0x000112bc       0x70 .obj/main.o
- .rodata        0x0001132c       0x20 .obj/print.o
- .rodata        0x0001134c       0x44 .obj/syscall.o
- .rodata        0x00011390        0x4 .obj/uart.o
-                0x00011390                out_addr
+.rodata         0x00011300       0xd4
+ .rodata        0x00011300       0x1c .obj/fiq.o
+ .rodata        0x0001131c        0x4 .obj/funcs.o
+ .rodata        0x00011320       0x10 .obj/irq.o
+ .rodata        0x00011330       0x3c .obj/main.o
+ .rodata        0x0001136c       0x20 .obj/print.o
+ .rodata        0x0001138c       0x44 .obj/syscall.o
+ .rodata        0x000113d0        0x4 .obj/uart.o
+                0x000113d0                out_addr
 
-.ARM.extab      0x00011394       0x84
- .ARM.extab     0x00011394        0xc .obj/fiq.o
- .ARM.extab     0x000113a0        0xc .obj/funcs.o
- .ARM.extab     0x000113ac       0x3c .obj/main.o
- .ARM.extab     0x000113e8       0x18 .obj/print.o
- .ARM.extab     0x00011400       0x18 .obj/syscall.o
- .ARM.extab     0x00011418        0x0 .obj/uart.o
- .ARM.extab     0x00011418        0x0 .obj/unwind.o
+.ARM.extab      0x000113d4       0x84
+ .ARM.extab     0x000113d4        0xc .obj/fiq.o
+ .ARM.extab     0x000113e0        0xc .obj/funcs.o
+ .ARM.extab     0x000113ec        0x0 .obj/interrupt.o
+ .ARM.extab     0x000113ec        0xc .obj/irq.o
+ .ARM.extab     0x000113f8       0x30 .obj/main.o
+ .ARM.extab     0x00011428       0x18 .obj/print.o
+ .ARM.extab     0x00011440       0x18 .obj/syscall.o
+ .ARM.extab     0x00011458        0x0 .obj/uart.o
+ .ARM.extab     0x00011458        0x0 .obj/unwind.o
 
-.ARM.exidx      0x00011418       0x78
- .ARM.exidx     0x00011418        0x8 .obj/fiq.o
- .ARM.exidx     0x00011420       0x10 .obj/funcs.o
+.ARM.exidx      0x00011458       0x80
+ .ARM.exidx     0x00011458        0x8 .obj/fiq.o
+ .ARM.exidx     0x00011460       0x10 .obj/funcs.o
                                  0x30 (size before relaxing)
- .ARM.exidx     0x00011430       0x28 .obj/main.o
- .ARM.exidx     0x00011458       0x18 .obj/print.o
+ .ARM.exidx     0x00011470        0x8 .obj/interrupt.o
+ .ARM.exidx     0x00011478        0x8 .obj/irq.o
+ .ARM.exidx     0x00011480       0x20 .obj/main.o
+ .ARM.exidx     0x000114a0       0x18 .obj/print.o
                                  0x28 (size before relaxing)
- .ARM.exidx     0x00011470       0x10 .obj/syscall.o
- .ARM.exidx     0x00011480        0x8 .obj/uart.o
- .ARM.exidx     0x00011488        0x8 .obj/unwind.o
+ .ARM.exidx     0x000114b8       0x10 .obj/syscall.o
+ .ARM.exidx     0x000114c8        0x8 .obj/uart.o
+ .ARM.exidx     0x000114d0        0x8 .obj/unwind.o
                                  0x18 (size before relaxing)
 
-.eh_frame_hdr   0x00011490        0x0
+.eh_frame_hdr   0x000114d8        0x0
  .eh_frame_hdr  0x00000000        0x0 .obj/startup.o
 
-.glue_7         0x00011490        0x0
+.glue_7         0x000114d8        0x0
  .glue_7        0x00000000        0x0 linker stubs
 
-.glue_7t        0x00011490        0x0
+.glue_7t        0x000114d8        0x0
  .glue_7t       0x00000000        0x0 linker stubs
 
-.vfp11_veneer   0x00011490        0x0
+.vfp11_veneer   0x000114d8        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x00011490        0x0
+.v4_bx          0x000114d8        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x00011490        0x0
+.iplt           0x000114d8        0x0
  .iplt          0x00000000        0x0 .obj/fiq.o
 
-.rel.dyn        0x00011490        0x0
+.rel.dyn        0x000114d8        0x0
  .rel.iplt      0x00000000        0x0 .obj/fiq.o
 
-.data           0x00011490      0x41b
-                0x00011490                data_start = .
+.data           0x000114d8      0x408
+                0x000114d8                data_start = .
  *(.data)
- .data          0x00011490        0x0 .obj/fiq.o
- .data          0x00011490        0x0 .obj/funcs.o
- .data          0x00011490        0x0 .obj/main.o
- .data          0x00011490      0x404 .obj/print.o
- .data          0x00011894        0x4 .obj/syscall.o
-                0x00011894                a
- .data          0x00011898        0x0 .obj/uart.o
- .data          0x00011898        0x0 .obj/unwind.o
- .data          0x00011898       0x13 .obj/exception.o
- .data          0x000118ab        0x0 .obj/intr.o
- .data          0x000118ab        0x0 .obj/lib1funcs.o
- .data          0x000118ab        0x0 .obj/startup.o
-                0x000118ab                data_end = .
+ .data          0x000114d8        0x0 .obj/fiq.o
+ .data          0x000114d8        0x0 .obj/funcs.o
+ .data          0x000114d8        0x0 .obj/interrupt.o
+ .data          0x000114d8        0x0 .obj/irq.o
+ .data          0x000114d8        0x0 .obj/main.o
+ .data          0x000114d8      0x404 .obj/print.o
+ .data          0x000118dc        0x4 .obj/syscall.o
+                0x000118dc                a
+ .data          0x000118e0        0x0 .obj/uart.o
+ .data          0x000118e0        0x0 .obj/unwind.o
+ .data          0x000118e0        0x0 .obj/exception.o
+ .data          0x000118e0        0x0 .obj/intr.o
+ .data          0x000118e0        0x0 .obj/lib1funcs.o
+ .data          0x000118e0        0x0 .obj/startup.o
+                0x000118e0                data_end = .
 
-.igot.plt       0x000118ac        0x0
+.igot.plt       0x000118e0        0x0
  .igot.plt      0x00000000        0x0 .obj/fiq.o
 
-.bss            0x000118ac      0x320
-                0x000118ac                bss_start = .
+.bss            0x000118e0      0x320
+                0x000118e0                bss_start = .
  *(.bss)
- .bss           0x000118ac        0x0 .obj/fiq.o
- .bss           0x000118ac        0x0 .obj/funcs.o
- .bss           0x000118ac      0x320 .obj/main.o
-                0x000118ac                arr
- .bss           0x00011bcc        0x0 .obj/print.o
- .bss           0x00011bcc        0x0 .obj/syscall.o
- .bss           0x00011bcc        0x0 .obj/uart.o
- .bss           0x00011bcc        0x0 .obj/unwind.o
- .bss           0x00011bcc        0x0 .obj/exception.o
- .bss           0x00011bcc        0x0 .obj/intr.o
- .bss           0x00011bcc        0x0 .obj/lib1funcs.o
- .bss           0x00011bcc        0x0 .obj/startup.o
-                0x00011bcc                bss_end = .
-                0x00011bcc                . = ALIGN (0x4)
-                0x00211bcc                . = (. + 0x200000)
-                0x00211bcc                stack_top = .
+ .bss           0x000118e0        0x0 .obj/fiq.o
+ .bss           0x000118e0        0x0 .obj/funcs.o
+ .bss           0x000118e0        0x0 .obj/interrupt.o
+ .bss           0x000118e0        0x0 .obj/irq.o
+ .bss           0x000118e0      0x320 .obj/main.o
+                0x000118e0                arr
+ .bss           0x00011c00        0x0 .obj/print.o
+ .bss           0x00011c00        0x0 .obj/syscall.o
+ .bss           0x00011c00        0x0 .obj/uart.o
+ .bss           0x00011c00        0x0 .obj/unwind.o
+ .bss           0x00011c00        0x0 .obj/exception.o
+ .bss           0x00011c00        0x0 .obj/intr.o
+ .bss           0x00011c00        0x0 .obj/lib1funcs.o
+ .bss           0x00011c00        0x0 .obj/startup.o
+                0x00011c00                bss_end = .
+                0x00011c00                . = ALIGN (0x4)
+                0x00211c00                . = (. + 0x200000)
+                0x00211c00                stack_top = .
 OUTPUT(final elf32-littlearm)
 
 .comment        0x00000000       0x30
  .comment       0x00000000       0x30 .obj/fiq.o
                                  0x31 (size before relaxing)
  .comment       0x00000000       0x31 .obj/funcs.o
+ .comment       0x00000000       0x31 .obj/interrupt.o
+ .comment       0x00000000       0x31 .obj/irq.o
  .comment       0x00000000       0x31 .obj/main.o
  .comment       0x00000000       0x31 .obj/print.o
  .comment       0x00000000       0x31 .obj/syscall.o
@@ -181,6 +200,10 @@ OUTPUT(final elf32-littlearm)
                 0x00000000        0x0 .obj/fiq.o
  .note.GNU-stack
                 0x00000000        0x0 .obj/funcs.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/interrupt.o
+ .note.GNU-stack
+                0x00000000        0x0 .obj/irq.o
  .note.GNU-stack
                 0x00000000        0x0 .obj/main.o
  .note.GNU-stack
@@ -199,20 +222,24 @@ OUTPUT(final elf32-littlearm)
  .ARM.attributes
                 0x00000034       0x34 .obj/funcs.o
  .ARM.attributes
-                0x00000068       0x34 .obj/main.o
+                0x00000068       0x34 .obj/interrupt.o
  .ARM.attributes
-                0x0000009c       0x34 .obj/print.o
+                0x0000009c       0x34 .obj/irq.o
  .ARM.attributes
-                0x000000d0       0x34 .obj/syscall.o
+                0x000000d0       0x34 .obj/main.o
  .ARM.attributes
-                0x00000104       0x34 .obj/uart.o
+                0x00000104       0x34 .obj/print.o
  .ARM.attributes
-                0x00000138       0x34 .obj/unwind.o
+                0x00000138       0x34 .obj/syscall.o
  .ARM.attributes
-                0x0000016c       0x24 .obj/exception.o
+                0x0000016c       0x34 .obj/uart.o
  .ARM.attributes
-                0x00000190       0x24 .obj/intr.o
+                0x000001a0       0x34 .obj/unwind.o
  .ARM.attributes
-                0x000001b4       0x24 .obj/lib1funcs.o
+                0x000001d4       0x24 .obj/exception.o
  .ARM.attributes
-                0x000001d8       0x24 .obj/startup.o
+                0x000001f8       0x24 .obj/intr.o
+ .ARM.attributes
+                0x0000021c       0x24 .obj/lib1funcs.o
+ .ARM.attributes
+                0x00000240       0x24 .obj/startup.o

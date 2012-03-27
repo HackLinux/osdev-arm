@@ -7,13 +7,6 @@ int arr[200];
 extern int bss_start;
 extern int bss_end;
 
-void dump_cpsr(char *str)
-{
-	int a;
-	__asm__ __volatile__ ("mrs %0, cpsr" : "=r"(a)::);
-	printk("id:%s, cpsr = %x \n", str, a);
-}
-
 
 void init_bss()
 {
@@ -26,7 +19,7 @@ int main()
 	init_bss();
 	enable_fiq();
 	gen_soft_irq();
-	dump_cpsr(0);
+	dump_cpsr(__func__);
 }
 
 void msg()

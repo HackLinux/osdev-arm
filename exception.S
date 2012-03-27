@@ -39,11 +39,13 @@ reserved_vec:
 	b reserved_vec
 
 irq_vec:
+	subs lr, lr, #4
+	stmfd sp!, {r0-r3, lr}
 	b irq_handler
+	ldmfd sp!, {r0-r3, pc}^ 
 
 fiq_vec:
 	subs lr, lr, #4
 	stmfd sp!, {r0-r3, lr}
 	bl fiq_handler
 	ldmfd sp!, {r0-r3, pc}^ 
-	mov pc, sp

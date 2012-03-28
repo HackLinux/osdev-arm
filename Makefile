@@ -40,7 +40,7 @@ cscope:
 	find $(shell pwd) -name "*.[chs]" > $(objdir)/cscope.files
 	cd $(objdir) && cscope -b -k -q
 clean:
-	rm -rf $(objdir) final
+	rm -rf $(objdir) final final.bin final.map
 
 run:
 	qemu-system-arm -M versatilepb

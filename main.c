@@ -22,7 +22,9 @@ int main()
 	disable_cpsr_irq();
 	enable_cpsr_fiq();
 	enable_cpsr_irq();
-
+/*
+	request_irq(irq
+*/
 	enable_fiq(4);
 	enable_irq(2);
 	gen_soft_irq(2);

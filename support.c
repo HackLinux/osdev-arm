@@ -11,7 +11,7 @@ static char modes[4][4] 	= {
 			};
 #endif
 #define get_mode(m) str_mode[modes[m&0x3][(m&0x6)>>2]]
-void dump_cpsr(char *str)
+void dump_cpsr(const char *str)
 {
 	int a;
 	__asm__ __volatile__ ("mrs %0, cpsr" : "=r"(a)::);

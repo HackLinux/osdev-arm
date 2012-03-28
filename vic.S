@@ -61,7 +61,6 @@ enable_irq:
 
 	ldr r1, =VIC_BASEADDR		/* load base addr */
 	ldr r2, [r1, #INTRSEL_OFF]	/* load the interrupt select register */
-
 	bic r2, r2, r0			/* enable irqs, by masking the corresponding irq bit */
 	str r2, [r1, #INTRSEL_OFF]	/* enables software interrupt line */
 	str r0, [r1, #INTRENBL_OFF]

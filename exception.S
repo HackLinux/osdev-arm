@@ -1,21 +1,27 @@
 .text 
-reset:
+reset:	
 	b reset_vec
-undefined:
+
+undefined: 	
 	b undefined_vec
-swi:
+
+swi:	
 	b swi_vec
-abort_d:
+
+abort_d:	
 	b abort_data_vec
-abort_p:
+
+abort_p:	
 	b abort_prefetch_vec
-reserved:
+
+reserved:	
 	b reserved_vec
-irq:
+
+irq:	
 	b irq_vec
+
 fiq:	
 	b fiq_vec
-
 
 
 reset_vec:
@@ -41,11 +47,11 @@ reserved_vec:
 irq_vec:
 	subs lr, lr, #4
 	stmfd sp!, {r0-r3, lr}
-	b irq_handler
+	bl irq_handler
 	ldmfd sp!, {r0-r3, pc}^ 
 
 fiq_vec:
 	subs lr, lr, #4
 	stmfd sp!, {r0-r3, lr}
 	bl fiq_handler
-	ldmfd sp!, {r0-r3, pc}^ 
+	ldmfd sp!, {r0-r3, pc}^

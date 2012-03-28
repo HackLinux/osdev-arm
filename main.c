@@ -16,9 +16,17 @@ void init_bss()
 int main()
 {
 	printk("Entered main\n");
+	dump_cpsr(__func__);
 	init_bss();
-	enable_fiq();
-	gen_soft_irq();
+	disable_cpsr_fiq();
+	disable_cpsr_irq();
+	enable_cpsr_fiq();
+	enable_cpsr_irq();
+
+	enable_fiq(4);
+	enable_irq(2);
+	gen_soft_irq(2);
+	gen_soft_irq(4);
 	dump_cpsr(__func__);
 }
 

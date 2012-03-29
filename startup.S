@@ -3,6 +3,8 @@
 
 _reset:
 	bl setup_stacks
+	ldr r0, =panic
+	bl log_info
 	bl main
 	b .
 
@@ -32,9 +34,11 @@ setup_stacks:
 
 
 dump:
-	mov r0, #1
-	bl dump_cpsr
+	ldr r0, =panic
+	bl log_info
 
+panic:
+	.string "panic"
 .equ STACK_SIZE, 0x1000
 .equ BASE_STACK, 0x20000
 .equ ABRT_STACK, BASE_STACK+STACK_SIZE

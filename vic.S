@@ -1,14 +1,26 @@
 .text
 .equ VIC_BASEADDR, 0x10140000
-.equ INTRSEL_OFF,  0x00c
-.equ INTRENBL_OFF, 0x010
-.equ SOFTINTR_OFF, 0x018
-.equ SOFTINTRCLR_OFF, 0x01C
 .equ IRQSTATUS_OFF, 0x00
 .equ FIQSTATUS_OFF, 0x04
+.equ RAWSTATUS_OFF, 0X08
+
+.equ INTRSEL_OFF,  0x00c
+.equ INTRENBL_OFF, 0x010
+.equ INTRCLR_OFF,  0x014
+
+
+.equ SOFTINTR_OFF,    0x018
+.equ SOFTINTRCLR_OFF, 0x01C
+
+.equ VECADDR_OFF,     0X030
+.equ DEF_VECTADDR_OFF, 0x034
+.equ VECTADDR_BASE_OFF, 0x100
+.equ VECTCNTL_BASE_OFF, 0x200
+
 .global enable_vic, gen_soft_irq, enable_irq, enable_fiq, enable_cpsr_irq, enable_cpsr_fiq, \
 	disable_cpsr_irq, disable_cpsr_fiq
 
+.global clear_hard_irq, clear_soft_irq
 
 
 
@@ -65,7 +77,6 @@ enable_irq:
 	str r2, [r1, #INTRSEL_OFF]	/* enables software interrupt line */
 	str r0, [r1, #INTRENBL_OFF]
 
-
 	ldmfd sp!, {pc}
 
 /* 
@@ -83,6 +94,13 @@ enable_fiq:
 	ldmfd sp!, {pc}
 
 
+enable_vector_irq:
+	stmfd sp!, {lr}
+
+	mov r1, r0		/* contains interrupt number */
+	ldr r0, =VIC_BASEADDR
+	
+	ldmfd sp!, {r0-r3, pc}
 /*generate_softint(20): Generates soft interrupt on line 20*/
 
 gen_soft_irq:
@@ -93,21 +111,41 @@ gen_soft_irq:
 
 .global fiq_handler, irq_handler
 
+
+clear_soft_irq:
+	ldr r1, =VIC_BASEADDR
+	str r0, [r1, #SOFTINTRCLR_OFF] 
+	mov pc, lr
+
+clear_hard_irq:
+	ldr r1, =VIC_BASEADDR
+	str r0, [r1, #INTRCLR_OFF]
+	mov pc, lr
+
 fiq_handler:
 	stmfd sp!, {lr}
-	ldr r1, =VIC_BASEADDR
-	ldr r0, [r1, #FIQSTATUS_OFF] 
-	bl handle_fiq 
-	ldr r1, =VIC_BASEADDR
-	str r0, [r1, #SOFTINTRCLR_OFF]
+	ldr r3, =VIC_BASEADDR
+	ldr r0, [r3, #FIQSTATUS_OFF] 
+	ldr r1, [r3, #INTRENBL_OFF]
+	ldr r2, [r3, #SOFTINTR_OFF]
+	bl handle_generic_IRQ 
+
+/*	ldr r1, =VIC_BASEADDR
+	str r0, [r1, #SOFTINTRCLR_OFF] */
+
 	ldmfd sp!, {pc}
 
 
 irq_handler:
 	stmfd sp!, {lr}
-	ldr r1, =VIC_BASEADDR
-	ldr r0, [r1, #IRQSTATUS_OFF] 
-        bl handle_irq
-        ldr r1, =VIC_BASEADDR
-        str r0, [r1, #SOFTINTRCLR_OFF]
+	
+	ldr r3, =VIC_BASEADDR
+	ldr r0, [r3, #FIQSTATUS_OFF] 
+	ldr r1, [r3, #INTRENBL_OFF]
+	ldr r2, [r3, #SOFTINTR_OFF]
+        bl handle_generic_IRQ
+
+/*      ldr r1, =VIC_BASEADDR
+        str r0, [r1, #SOFTINTRCLR_OFF] */
+	
 	ldmfd sp!, {pc}

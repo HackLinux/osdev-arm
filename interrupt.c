@@ -6,43 +6,56 @@
 struct IRQ_LIST  irq_list[MAX_IRQ];
 
 
-
-int handle_irq(int status)
+void generate_software_interrupt(int irq)
 {
-	printk("in irq handler ,received interrupt on line %d \n", status);
-	dump_cpsr(__func__);
-	return status;
-}
-int handle_fiq(int status)
-{
-	printk("in fiq handler ,received interrupt on line %d \n", status);
-	dump_cpsr(__func__);
-	return status;
-
+	gen_soft_irq(1<<irq);	
 }
 
-int request_irq(int irqno, int mode, intr_handler h)
+int handle_generic_IRQ(int status, int irq_status, int soft_irq_status)
 {
-	if (irqno > MAX_IRQ) {
+	int i;
+	int interrupt;
+	for (i = 0; i < MAX_IRQ; i++) {
+		if (status & (1 << i)){
+			irq_list[i].h(i, irq_list[i].data);
+			interrupt = 1<<i;
+			if (irq_status & interrupt) 
+				clear_hard_irq(interrupt);
+			else if (soft_irq_status & interrupt)
+				clear_soft_irq(interrupt);
+			else
+				printk("U screweup, irq unknown \n");
+		}
+	}
+			
+	dprintk("in fiq handler ,received interrupt on line %d \n", status);
+	log_info(__func__);
+	return status;
+
+}
+
+int request_irq(int irq, int mode, intr_handler h, void *data)
+{
+	if (irq > MAX_IRQ) {
 		printk("Invalid irq no = %d\n");
 		return 0;
 	}
-	if (irq_list[irqno].no != 0){
+	if (irq_list[irq].h){
 		printk("Irq is in use\n");
 		return 0;
 	}
 
-	irq_list[irqno].no = 1;
-	irq_list[irqno].h  = h;	
-	irq_list[irqno].mode = mode;
+	irq_list[irq].h  	= h;	
+	irq_list[irq].mode 	= mode;
+	irq_list[irq].data	= data;
 		
 	switch (mode) {
 		case IRQ_MODE:
-			enable_irq(1<<irqno);
+			enable_irq(1<<irq);
 		break;
 
 		case FIQ_MODE:
-			enable_fiq(1<<irqno);
+			enable_fiq(1<<irq);
 		break;
 #if 0
 		case VECTOR_MODE:
@@ -62,13 +75,13 @@ int request_irq(int irqno, int mode, intr_handler h)
 	return 1;
 }
 
-void free_irq(int irqno)
+void free_irq(int irq)
 {
-	if (irq_list[irqno].no != 1) {
+	if (!irq_list[irq].h) {
 		printk("Irq is not registered\n");
-		return ;
+		return;
 	}
-	irq_list[irqno].no = 0;
-	irq_list[irqno].h  = 0;
-	irq_list[irqno].mode = 0;
+	irq_list[irq].h  = 0;
+	irq_list[irq].mode = 0;
+	irq_list[irq].data = 0;
 }

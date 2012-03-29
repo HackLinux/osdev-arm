@@ -3,4 +3,11 @@
 
 char * printk(const char *fmt, ...);
 
+#ifdef DEBUG 
+#define dprintk(fmt, ...) \
+	printk(fmt, ...)
+#else
+#define dprintk(fmt, ...) 
+#endif
+
 #endif

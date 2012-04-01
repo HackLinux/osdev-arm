@@ -26,10 +26,11 @@ int main()
 
 	init_bss();
 	arch_init();
+	timer_init();
 	
-	request_irq(2, FIQ_MODE, my_handler, 0); 
+/*	request_irq(2, FIQ_MODE, my_handler, 0); 
 	generate_software_interrupt(2);
-	
+*/	
 	log_info(__func__);
 }
 

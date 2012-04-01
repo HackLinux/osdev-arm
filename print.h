@@ -4,10 +4,9 @@
 char * printk(const char *fmt, ...);
 
 #ifdef DEBUG 
-#define dprintk(fmt, ...) \
-	printk(fmt, ...)
+#define dprintk printk
 #else
-#define dprintk(fmt, ...) 
+#define dprintk 
 #endif
 
 #endif

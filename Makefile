@@ -1,5 +1,5 @@
 
-CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g
+CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g -DDEBUG
 CROSS    ?=  arm-none-linux-gnueabi-
 
 objdir ?= .obj

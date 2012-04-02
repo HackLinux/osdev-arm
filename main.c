@@ -33,7 +33,6 @@ int main()
 	
 //	generate_software_interrupt(2);
 	
-	log_info(__func__);
 	int i, j;
 
 /*	request_irq(4, IRQ_MODE, my_handler, 0); 
@@ -41,10 +40,16 @@ int main()
 		printk("hello %d \n", i);
 		generate_software_interrupt(4);
 	} */
-
-	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
-	while(1);
+	extern void change_to_mode(int);
+#define USER_MODE 0x10
+#define SVC_MODE 0x13
+#define SYS_MODE 0x1f
 	log_info(__func__);
+	change_to_mode(((~1>>5)<<5) | SYS_MODE);
+	log_info(__func__);
+	change_to_mode(((~1>>5)<<5) | SVC_MODE);
+	log_info(__func__);
+	while(1);
 }
 
 void msg()

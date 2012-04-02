@@ -37,8 +37,8 @@ $(objdir)/.dummy :
 	touch $(objdir)/.dummy
 
 cscope: 
-	find $(shell pwd) -name "*.[chs]" > $(objdir)/cscope.files
-	cd $(objdir) && cscope -b -k -q
+	find $(shell pwd) -name "*.[chsS]" > cscope.files
+	cscope -b -k -q
 clean:
 	rm -rf $(objdir) final final.bin final.map
 

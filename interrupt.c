@@ -11,26 +11,27 @@ void generate_software_interrupt(int irq)
 	gen_soft_irq(1<<irq);	
 }
 
-int handle_generic_IRQ(int status, int irq_status, int soft_irq_status)
+/********************************************************************************** 
+ * irq_enable 		: interrupt line enabled				  *	
+ * irq_status 		: fiq/irq status 					  *
+ * soft_irq_status 	: softirq status					  *	
+ * fiq, irq, soft_irq are mutually exclusive according to our programming style   *
+ **********************************************************************************/
+int handle_generic_IRQ(int irq_status)
 {
 	int i;
 	int interrupt;
+	dprintk("%s handler ,received interrupt  with irq_status: %x\n", __func__, irq_status);
 	for (i = 0; i < MAX_IRQ; i++) {
-		if (status & (1 << i)){
+		interrupt = 1<<i;
+		if (irq_status & interrupt) {
 			irq_list[i].h(i, irq_list[i].data);
-			interrupt = 1<<i;
-			if (irq_status & interrupt) 
-				clear_hard_irq(interrupt);
-			else if (soft_irq_status & interrupt)
-				clear_soft_irq(interrupt);
-			else
-				printk("U screweup, irq unknown \n");
+			//clear_hard_irq(interrupt);
 		}
 	}
 			
-	dprintk("in fiq handler ,received interrupt on line %d \n", status);
 	log_info(__func__);
-	return status;
+	return irq_status;
 
 }
 
@@ -71,6 +72,7 @@ int request_irq(int irq, int mode, intr_handler h, void *data)
 			printk("Invalid mode\n");
 		break;
 	}
+	printk("Irq %d registersed\n", irq);
 
 	return 1;
 }

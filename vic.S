@@ -114,7 +114,7 @@ gen_soft_irq:
 
 clear_soft_irq:
 	ldr r1, =VIC_BASEADDR
-	str r0, [r1, #SOFTINTRCLR_OFF] 
+	str r0, [r1, #SOFTINTRCLR_OFF]  
 	mov pc, lr
 
 clear_hard_irq:
@@ -122,12 +122,15 @@ clear_hard_irq:
 	str r0, [r1, #INTRCLR_OFF]
 	mov pc, lr
 
+get_enabled_softirq:
+
+
+
+
 fiq_handler:
 	stmfd sp!, {lr}
 	ldr r3, =VIC_BASEADDR
 	ldr r0, [r3, #FIQSTATUS_OFF] 
-	ldr r1, [r3, #INTRENBL_OFF]
-	ldr r2, [r3, #SOFTINTR_OFF]
 	bl handle_generic_IRQ 
 
 /*	ldr r1, =VIC_BASEADDR
@@ -140,9 +143,7 @@ irq_handler:
 	stmfd sp!, {lr}
 	
 	ldr r3, =VIC_BASEADDR
-	ldr r0, [r3, #FIQSTATUS_OFF] 
-	ldr r1, [r3, #INTRENBL_OFF]
-	ldr r2, [r3, #SOFTINTR_OFF]
+	ldr r0, [r3, #IRQSTATUS_OFF] 
         bl handle_generic_IRQ
 
 /*      ldr r1, =VIC_BASEADDR

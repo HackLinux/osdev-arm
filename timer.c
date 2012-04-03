@@ -28,6 +28,8 @@
 #define TIMER_CTRL_DIV256  	(2<<2)
 #define TIMER_SIZE_32  		(1 << 1)
 #define TIMER_ONE_SHOT  	(1 << 0)
+
+volatile static unsigned int jiffies = 0;
 inline unsigned int get_timer_base(int index)
 {
 	switch (index) {
@@ -53,11 +55,27 @@ void print_timer_values(int count)
 
 
 
+/* we will maintain a linked list of structures, with decreasing timeout values, relative 
+ * to previous entries(maintain in jiffies)
+ * 10    - 25    - 35     - 50
+ * ____    ___     ___      ___
+ *| 10 |->|15 |-> |10 | -> |15 |
+ *|____|  |___|   |___|	   |___| 
+ */
+
+
+void schedule()
+{
+
+}
+
 int timer_handler(int irq, void *data)
 {
 	volatile unsigned int *tbase = (volatile unsigned int *)get_timer_base(0);
 	tbase[TIMER_INTCLR] = 1;
-
+	jiffies++;
+//	call_handlers();
+	schedule();
 }
 
 
@@ -85,17 +103,15 @@ void timer_init()
  *	timerxload = (Interval x TIMCLKFREQ)/ (TIMCLKENXDIV x PRESCALEDIV)
  *	TIMCLKENXDIV = 1, PRESCALEDIV = 256, Interval = 1 sec, TIMCLKFREQ = 1MHZ 
  */
-	timer_reload =  (10 * 1000000)/(1 * 256);
+	/* set the timer for 10 ms */
+	timer_reload = (10000)/256;//(1 * 1000000)/(1 * 256) 1 sec
 	timer_bg_reload = timer_reload;
 	tbase[TIMER_LOAD] = timer_reload;
 	tbase[TIMER_BGLOAD] = timer_bg_reload;
 
 	request_irq(4, IRQ_MODE, timer_handler, 0); 
-/*	request_irq(5, IRQ_MODE, timer_handler, 0); 
-	request_irq(6, IRQ_MODE, timer_handler, 0); 
-	request_irq(7, IRQ_MODE, timer_handler, 0); */
 	tbase[TIMER_CNTL] |= TIMER_ENABLE|TIMER_INT_EN;
-	printk("Timer value = %d, irstatus = %d, timer_ctrl = %x \n", tbase[TIMER_VALUE], tbase[TIMER_INTR_STATUS], tbase[TIMER_CNTL]);
+	dprintk("Timer value = %d, irstatus = %d, timer_ctrl = %x \n", tbase[TIMER_VALUE], tbase[TIMER_INTR_STATUS], tbase[TIMER_CNTL]);
 
 	printk("Timer initialization done \n");
 	

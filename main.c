@@ -27,6 +27,7 @@ int main()
 {
 	printk("Entered main\n");
 
+	printk("Cmd args : %s \n", (char*)0x100);
 	init_bss();
 	arch_init();
 	timer_init();
@@ -41,10 +42,11 @@ int main()
 		printk("hello %d \n", i);
 		generate_software_interrupt(4);
 	} */
-
 	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
-	while(1);
 	log_info(__func__);
+	int count = 0;
+	while(1) {
+	}
 }
 
 void msg()

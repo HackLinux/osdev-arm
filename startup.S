@@ -1,5 +1,5 @@
 
-.global _reset
+.global _reset, change_to_mode
 
 _reset:
 	bl setup_stacks
@@ -37,8 +37,20 @@ dump:
 	ldr r0, =panic
 	bl log_info
 
+change_to_mode:
+	mov r2, lr
+	mrs r1, cpsr
+	orr r1, r0
+	msr cpsr_c, r1
+	mov pc, r2
+	
 panic:
 	.string "panic"
+
+
+
+
+
 .equ STACK_SIZE, 0x1000
 .equ BASE_STACK, 0x20000
 .equ ABRT_STACK, BASE_STACK+STACK_SIZE

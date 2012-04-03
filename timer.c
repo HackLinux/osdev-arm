@@ -74,6 +74,7 @@ int timer_handler(int irq, void *data)
 	volatile unsigned int *tbase = (volatile unsigned int *)get_timer_base(0);
 	tbase[TIMER_INTCLR] = 1;
 	jiffies++;
+	printk("timer called\n");
 //	call_handlers();
 	schedule();
 }
@@ -104,7 +105,7 @@ void timer_init()
  *	TIMCLKENXDIV = 1, PRESCALEDIV = 256, Interval = 1 sec, TIMCLKFREQ = 1MHZ 
  */
 	/* set the timer for 10 ms */
-	timer_reload = (10000)/256;//(1 * 1000000)/(1 * 256) 1 sec
+	timer_reload = (1 * 1000000)/(1 * 256) ;//1 sec
 	timer_bg_reload = timer_reload;
 	tbase[TIMER_LOAD] = timer_reload;
 	tbase[TIMER_BGLOAD] = timer_bg_reload;

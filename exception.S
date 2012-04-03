@@ -32,7 +32,9 @@ undefined_vec:
 
 swi_vec:
 	stmfd sp!,{r0-r3,lr}
-	bl syscall
+	mov lr,pc
+	mov r0, r10
+	ldr pc,=syscall
 	ldmfd sp!,{r0-r3,pc}^
 
 abort_data_vec:
@@ -47,11 +49,20 @@ reserved_vec:
 irq_vec:
 	subs lr, lr, #4
 	stmfd sp!, {r0-r3, lr}
-	bl irq_handler
+	mov lr, pc
+	ldr pc, =irq_handler
 	ldmfd sp!, {r0-r3, pc}^ 
 
 fiq_vec:
 	subs lr, lr, #4
 	stmfd sp!, {r0-r3, lr}
-	bl fiq_handler
+	mov lr, pc
+	ldr pc, =fiq_handler
 	ldmfd sp!, {r0-r3, pc}^
+
+
+.global offset
+.data
+offset :
+	.word 0x00000000
+

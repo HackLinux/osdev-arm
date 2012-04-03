@@ -1,38 +1,46 @@
 ENTRY(_reset)
-
 SECTIONS 
 {
-. = 0;
-.idt : {.obj/exception.o(.text)}
-. = 0x10000;
-.start : {.obj/startup.o(.text)}
+	/*. = 0;
+	.idt : {.obj/exception.o(.text)} */
+	. = 0x10000;
+	.start : {.obj/startup.o(.text)}
+
+	exception_handlers = .;
+	.idt   : {
+		__idt_start = .;
+			.obj/exception.o(.text)
+			.obj/exception.o(.data)
+			.obj/exception.o(.bss)
+		__idt_end = .;
+		 } 
 
 
 .text	: 
 {
-text_start = .;
-*(.text)
-text_end   = .;
+	text_start = .;
+	*(.text)
+	text_end   = .;
 }
 
 
 .data	: 
 {
-data_start = .;
-*(.data)
-data_end = .;
+	data_start = .;
+	*(.data)
+	data_end = .;
 }
 
 
 .bss	: 
 {
-bss_start = .;
-*(.bss)
-bss_end   = .;
+	bss_start = .;
+	*(.bss)
+	bss_end   = .;
 }
 
-.	= ALIGN(4);
+	. = ALIGN(4);
 
-.      = . + 0x200000;	/*2 MB */
-stack_top = .;
+	. = . + 0x200000;	/*2 MB */
+	stack_top = .;
 }

@@ -23,28 +23,41 @@ int my_handler(int irqno, void *data)
 }
 
 void print_timer_values(int);
+
+void parse_args(const char *args)
+{
+	printk("cmd line = %s\n", args);
+
+
+}
+
+
+
 int main()
 {
 	printk("Entered main\n");
-
-	printk("Cmd args : %s \n", (char*)0x100);
+#define QEMU_CMDLINE_ADDR 0x12c
+	parse_args((const char *)QEMU_CMDLINE_ADDR);
 	init_bss();
 	arch_init();
 	timer_init();
-	
-//	generate_software_interrupt(2);
+
+	//	generate_software_interrupt(2);
 	
 	log_info(__func__);
-	int i, j;
-
-/*	request_irq(4, IRQ_MODE, my_handler, 0); 
+	int j;
+/*
+	request_irq(4, IRQ_MODE, my_handler, 0); 
 	for( i =1 ; i < 10; i++) {
 		printk("hello %d \n", i);
 		generate_software_interrupt(4);
-	} */
+	} 
+*/
 	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
 	log_info(__func__);
 	int count = 0;
+	 __asm__ __volatile__("swi #10"::);
+	
 	while(1) {
 	}
 }

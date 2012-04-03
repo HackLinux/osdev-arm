@@ -1,8 +1,8 @@
 
 int a = 0x12345;
-void syscall()
+void syscall(int no)
 {
-	printk("In  syscall \n");
+	printk("In  syscall: %d \n", no);
 	printk(" stack addr = %x\n", &a);
 	__asm__ __volatile__("mov %0, sp":"=r"(a)::);
 	printk(" stack addr = %x\n", a);

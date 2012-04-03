@@ -33,7 +33,6 @@ undefined_vec:
 swi_vec:
 	stmfd sp!,{r0-r3,lr}
 	mov lr,pc
-	mov r0, r10
 	ldr pc,=syscall
 	ldmfd sp!,{r0-r3,pc}^
 

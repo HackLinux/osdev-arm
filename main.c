@@ -57,6 +57,7 @@ int main()
 	log_info(__func__);
 	int count = 0;
 	 __asm__ __volatile__("swi #10"::);
+	printk("into user land\n");
 	
 	while(1) {
 	}

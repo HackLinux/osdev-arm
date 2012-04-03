@@ -63,19 +63,46 @@ void print_timer_values(int count)
  *|____|  |___|   |___|	   |___| 
  */
 
+unsigned int rem_jiffies[20] = {0};
+int timers_cnt = 0;
+#define HZ 100
+#define JIFFY 1000/HZ
+/* 1 jiffy = 10 msecs*/
+void sleep(int msecs)
+{
+	unsigned int mine = -1;
+	int i;
+	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) {
+		if (!rem_jiffies[i]) {
+			mine = i;
+			rem_jiffies[i] = msecs / (JIFFY);
+			break;
+		}
+	}
+	if (mine != -1)
+		while (rem_jiffies[mine]);
+}
 
 void schedule()
 {
 
 }
 
+void call_handlers()
+{
+	int i;
+	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) 
+		if (rem_jiffies[i]) 
+			rem_jiffies[i]--;
+
+}
 int timer_handler(int irq, void *data)
 {
 	volatile unsigned int *tbase = (volatile unsigned int *)get_timer_base(0);
 	tbase[TIMER_INTCLR] = 1;
 	jiffies++;
-	printk("timer called\n");
-//	call_handlers();
+	//printk("timer called\n");
+	call_handlers();
 	schedule();
 }
 
@@ -105,7 +132,7 @@ void timer_init()
  *	TIMCLKENXDIV = 1, PRESCALEDIV = 256, Interval = 1 sec, TIMCLKFREQ = 1MHZ 
  */
 	/* set the timer for 10 ms */
-	timer_reload = (1 * 1000000)/(1 * 256) ;//1 sec
+	timer_reload = (1 * 10000)/(1 * 256) ;//1 sec
 	timer_bg_reload = timer_reload;
 	tbase[TIMER_LOAD] = timer_reload;
 	tbase[TIMER_BGLOAD] = timer_bg_reload;

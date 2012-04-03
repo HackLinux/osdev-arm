@@ -60,6 +60,8 @@ int main()
 	printk("into user land\n");
 	
 	while(1) {
+		printk("sleep for 2 secs\n");
+		sleep(2000);
 	}
 }
 

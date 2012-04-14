@@ -44,7 +44,7 @@ int main()
 
 	//	generate_software_interrupt(2);
 	
-	log_info(__func__);
+	//log_info();
 	int j;
 /*
 	request_irq(4, IRQ_MODE, my_handler, 0); 
@@ -54,9 +54,10 @@ int main()
 	} 
 */
 	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
-	log_info(__func__);
+	log_info_str("in main\n");
 	int count = 0;
 	 __asm__ __volatile__("swi #10"::);
+	
 	printk("into user land\n");
 	
 	while(1) {

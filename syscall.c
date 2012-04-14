@@ -1,8 +1,8 @@
-
+#include "funcs.h"
 int a = 0x12345;
 void syscall(int no)
 {
-	printk("In  syscall: %d \n", no);
+	log_info_str("In  syscall: %d \n", no);
 }
 void __div0(void)
 {

@@ -1,5 +1,6 @@
 //#include "print.h"
 #include "stdarg.h"
+#include "funcs.h"
 #if 0
 #define args_list char *
 
@@ -97,6 +98,17 @@ static int skip_atoi(const char *s, int *j)
     return i;
 }
 
+static int con_write_enabled = 1;
+
+void disable_con_write()
+{
+	con_write_enabled = 0;
+}
+
+void enable_con_write()
+{
+	con_write_enabled = 1;
+}
 
 
 /* %s, %c, %x, %d, %% */
@@ -189,10 +201,7 @@ char * printk(const char *fmt, ...)
 	}
 	buf[ptr] = '\0';
 	args_end(args);
-	console_write(buf);
-#if 0
-	for (i=0; i<ptr; ++i)
-		print_c(buf[i], KPL[kl].fg, KPL[kl].bg);
-#endif
+	if (con_write_enabled)
+		console_write(buf);
 	return buf;
 }

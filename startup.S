@@ -1,10 +1,8 @@
-
 .global _reset, change_to_mode
-
 _reset:
 	bl setup_stacks
 	ldr r0, =panic
-	bl log_info
+	bl asm_log_info
 	bl main
 	b .
 
@@ -35,7 +33,7 @@ setup_stacks:
 
 dump:
 	ldr r0, =panic
-	bl log_info
+	bl asm_log_info
 
 change_to_mode:
 	mov r2, lr

@@ -11,9 +11,9 @@ void * memset(void *a, int ch, size_t sz)
 
 }
 
-char *  strncpy(char *dst, const char *src, int sz)
+char *  strcpy(char *dst, const char *src)
 {
-	while(sz--)
+	while(*src)
 		*dst++ = *src++;
 }
 
@@ -35,6 +35,13 @@ int memcmp(void *s1,  void *s2, int sz)
 	return (*--t1 - *--t2);	
 
 }
+char *strcat(const char *s1, const char *s2)
+{
+	while(*s1  && *s1) 
+		*s1++ == *s2++;
+	return s1;
+}
+
 
 
 int strncmp(const char *s1, const char *s2, size_t sz)

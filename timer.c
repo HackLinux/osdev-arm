@@ -65,7 +65,7 @@ void print_timer_values(int count)
 
 unsigned int rem_jiffies[20] = {0};
 int timers_cnt = 0;
-#define HZ 100
+#define HZ 10
 #define JIFFY 1000/HZ
 /* 1 jiffy = 10 msecs*/
 void sleep(int msecs)
@@ -85,6 +85,7 @@ void sleep(int msecs)
 
 void schedule()
 {
+	printk("scheduler called\n");
 
 }
 
@@ -132,7 +133,8 @@ void timer_init()
  *	TIMCLKENXDIV = 1, PRESCALEDIV = 256, Interval = 1 sec, TIMCLKFREQ = 1MHZ 
  */
 	/* set the timer for 10 ms */
-	timer_reload = (1 * 10000)/(1 * 256) ;//1 sec
+	/* 1000000 = 1 sec, 1 HZ */
+	timer_reload = (1 * 1000000)/(1 * 256 * HZ) ;//1 sec
 	timer_bg_reload = timer_reload;
 	tbase[TIMER_LOAD] = timer_reload;
 	tbase[TIMER_BGLOAD] = timer_bg_reload;

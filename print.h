@@ -2,7 +2,10 @@
 #define __PRINT_H
 
 char * printk(const char *fmt, ...);
+char * snprintk(const char *fmt, ...);
 
+void enable_con_write();
+void disable_con_write();
 #ifdef DEBUG 
 #define dprintk printk
 #else

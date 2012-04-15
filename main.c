@@ -1,5 +1,6 @@
 #include "funcs.h"
 #include "interrupt.h"
+#include "task.h"
 
 int print(char *s);
 void setup_idt();
@@ -7,10 +8,11 @@ int arr[200];
 
 extern int bss_start;
 extern int bss_end;
+extern int mem_start;
 int timer_handler(int irq, void *data);
 
 
-void init_bss()
+void bss_init()
 {
 	printk("%x %x \n", &bss_start, &bss_end);
 	memset(&bss_start, 0, &bss_end - &bss_start);
@@ -27,20 +29,26 @@ void print_timer_values(int);
 void parse_args(const char *args)
 {
 	printk("cmd line = %s\n", args);
-
-
 }
 
 
+int idle_thread()
+{
+	while (1) {
+		sleep(2000);
+		printk("Running idle thread\n");
+	}
+}
 
 int main()
 {
 	printk("Entered main\n");
 #define QEMU_CMDLINE_ADDR 0x12c
 	parse_args((const char *)QEMU_CMDLINE_ADDR);
-	init_bss();
+	bss_init();
 	arch_init();
 	timer_init();
+	mem_init(&mem_start, (long)&mem_start + 10<<20); //ask to manage 10 MB
 
 	//	generate_software_interrupt(2);
 	
@@ -53,8 +61,11 @@ int main()
 		generate_software_interrupt(4);
 	} 
 */
+	create_thread(idle_thread);
 	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
 	log_info_str("in main\n");
+
+	// call schedule end of main shall never return
 	int count = 0;
 	 __asm__ __volatile__("swi #10"::);
 	

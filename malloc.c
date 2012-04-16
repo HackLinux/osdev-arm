@@ -6,12 +6,12 @@ void *last_valid_address;
 void mem_init(long start, long end)
 { 
 	/* grab the last valid address from the OS */  
-	last_valid_address = end;     
+	last_valid_address = (void *)end;     
 
 	/* we don't have any memory to manage yet, so 
 	 *   *just set the beginning to be last_valid_address 
 	 *     */  
-	managed_memory_start = start;     
+	managed_memory_start = (void *)start;     
 
 	/* Okay, we're initialized and ready to go */
 	has_initialized = 1;   

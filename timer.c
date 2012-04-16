@@ -83,12 +83,6 @@ void sleep(int msecs)
 		while (rem_jiffies[mine]);
 }
 
-void schedule()
-{
-	printk("scheduler called\n");
-
-}
-
 void call_handlers()
 {
 	int i;

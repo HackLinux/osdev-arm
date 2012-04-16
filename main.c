@@ -1,6 +1,7 @@
 #include "funcs.h"
 #include "interrupt.h"
 #include "task.h"
+#include "processor.h"
 
 int print(char *s);
 void setup_idt();
@@ -34,6 +35,7 @@ void parse_args(const char *args)
 
 int idle_thread()
 {
+	printk("In idle thread\n");
 	while (1) {
 		sleep(2000);
 		printk("Running idle thread\n");
@@ -62,9 +64,11 @@ int main()
 	} 
 */
 	create_thread(idle_thread);
-	 __asm__ __volatile__("msr cpsr_c, #0x10"::);
-	log_info_str("in main\n");
-
+	log_info_str("In user space\n");
+	//change_mode(USR_MODE);
+	scheduler_init();
+	idle_thread();
+	
 	// call schedule end of main shall never return
 	int count = 0;
 	 __asm__ __volatile__("swi #10"::);

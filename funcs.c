@@ -50,9 +50,3 @@ int strncmp(const char *s1, const char *s2, size_t sz)
 	return (*--s1 - *--s2); 
 }
 
-void panic(char *s)
-{
-	printk("%s", s);
-	while(1);
-}
-

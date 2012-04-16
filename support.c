@@ -1,6 +1,6 @@
 #include "funcs.h"
+#include "print.h"
 
-int print(char *s);
 char str_mode[][4] 	= {"", "abt", "fiq",  "irq", "svc", "sys", "und", "usr"}; 
 #if 1
 static char modes[4][4] 	= {
@@ -38,4 +38,9 @@ void hang()
 {
 	log_info();
 	while(1);
+}
+void panic(char *str)
+{
+	printk(str);
+	hang();
 }

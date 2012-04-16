@@ -63,7 +63,7 @@ int create_thread(int (*thread_fn)())
 	if (num_threads > MAX_THREADS)
 		return 0;
 
-	pcb = malloc(sizeof(pcontext));
+	pcb = kmalloc(sizeof(pcontext));
 	printk("After malloc\n");
 	pid = get_free_pid();
 	if (pid == -1) {
@@ -90,6 +90,6 @@ void exit_thread()
 	}
 	mark_pid(pcb->pid, 0);
 	num_threads--;
-	free(pcb);
+	kfree(pcb);
 	schedule();
 }

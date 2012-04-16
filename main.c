@@ -50,7 +50,7 @@ int main()
 	bss_init();
 	arch_init();
 	timer_init();
-	mem_init(&mem_start, (long)&mem_start + 10<<20); //ask to manage 10 MB
+	mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 
 	//	generate_software_interrupt(2);
 	
@@ -64,9 +64,9 @@ int main()
 	} 
 */
 	create_thread(idle_thread);
-	log_info_str("In user space\n");
 	//change_mode(USR_MODE);
 	scheduler_init();
+	//log_info_str("In user space\n");
 	idle_thread();
 	
 	// call schedule end of main shall never return

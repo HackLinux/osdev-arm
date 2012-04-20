@@ -191,7 +191,7 @@ free and go up to the top.
 		
 }
 
-void kfree(long addr)
+void kfree(void *addr)
 {
 	buddy *n = (buddy *)(addr - sizeof(buddy));
 	buddy *p;

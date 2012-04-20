@@ -64,12 +64,14 @@ int main()
 	} 
 */
 	create_thread(idle_thread);
-	//change_mode(USR_MODE);
 	scheduler_init();
-	//log_info_str("In user space\n");
+	__asm__ __volatile__("msr cpsr_c, #0x10");
+	change_mode(USR_MODE);
+	log_info_str("In user space\n");
 	idle_thread();
+	/* we shall never return here */
+	/* end of world */
 	
-	// call schedule end of main shall never return
 	int count = 0;
 	 __asm__ __volatile__("swi #10"::);
 	

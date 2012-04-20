@@ -1,15 +1,20 @@
 
 
 
-CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g 
+CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude
 #-DDEBUG
 CROSS    ?=  arm-none-linux-gnueabi-
 
+LINKER_DIR = linker
+
 objdir ?= .obj
 
+vpath %.c arch kernel lib
+vpath %.S arch kernel lib
+vpath %.h include
 
-csources    = $(wildcard *.c)
-asmsources  = $(wildcard *.S)
+csources    = $(wildcard arch/*.c kernel/*.c lib/*.c)
+asmsources  = $(wildcard arch/*.S lib/*.S)
 
 asmobjs	:= $(patsubst %.S,$(objdir)/%.o,$(notdir $(asmsources)))
 cobjs   := $(patsubst %.c,$(objdir)/%.o,$(notdir $(csources))) 
@@ -20,7 +25,7 @@ dummy	= $(objdir)/.dummy
 tgt := final
 
 $(tgt): $(dummy) $(objs)
-	$(CROSS)gcc $(objs) -o $@ -Wl,-T ld.script -Wl,-M -nostdlib  $(CFLAGS) > final.map
+	$(CROSS)gcc $(objs) -o $@ -Wl,-T $(LINKER_DIR)/ld.script -Wl,-M -nostdlib  $(CFLAGS) > final.map
 	$(CROSS)objcopy -O binary $@ $@.bin
 
 $(objdir)/%.o:%.c

@@ -35,7 +35,7 @@ int memcmp(void *s1,  void *s2, int sz)
 	return (*--t1 - *--t2);	
 
 }
-char *strcat(const char *s1, const char *s2)
+char *strcat(char *s1, const char *s2)
 {
 	while(*s1  && *s1) 
 		*s1++ == *s2++;

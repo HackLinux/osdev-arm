@@ -65,7 +65,7 @@ void print_timer_values(int count)
 
 unsigned int rem_jiffies[20] = {0};
 int timers_cnt = 0;
-#define HZ 10
+#define HZ 1
 #define JIFFY 1000/HZ
 /* 1 jiffy = 10 msecs*/
 void sleep(int msecs)

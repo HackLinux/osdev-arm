@@ -3,22 +3,28 @@
 #include "malloc.h"
 #include "funcs.h"
 
-typedef struct context {
-/*	int reg[16]; */
-	int r0, r1, r2, r3;
-	int r4, r5, r6, r7, r8;
-	int r9, r10, r11, r12;
-	int sp, lr, pc;
-	int pid;
-	unsigned char stack[STACK_SIZE];
-	struct context *next;
-	unsigned int in_use;
-}pcontext;
 
 static pcontext *pid_array[MAX_THREADS];
 
 static pcontext *cur_pcb = 0;
+static pcontext *head = 0;
+static pcontext *tail = 0;
 static int num_threads = 0;
+
+pcontext *set_task_list_head(pcontext *pcb)
+{
+	head = pcb;
+}
+
+pcontext *set_task_list_tail(pcontext *pcb)
+{
+	tail = pcb;
+}
+
+pcontext *get_task_list_tail()
+{
+	return tail;
+}
 
 void set_current(pcontext *pcb)
 {
@@ -75,8 +81,15 @@ int create_thread(int (*thread_fn)())
 	pcb->sp = (long)pcb->stack + sizeof(pcb->stack)-1;
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
-	mark_pid(pid, pcb);
+	/* disable interrupts */
+	pcontext *t = get_task_list_tail();
+	pcb->next = t->next;
+	pcb->prev = t;
+	t->next = pcb;
+	set_task_list_tail(pcb);
 	num_threads++;
+	/* enable interrupts */
+	mark_pid(pid, pcb);
 	return 1;
 }
 
@@ -90,6 +103,13 @@ void exit_thread()
 	}
 	mark_pid(pcb->pid, 0);
 	num_threads--;
+	pcontext *p, *c, *n;
+	p = pcb->prev;
+	n = pcb->next;
+	p->next = n;
+	n->prev = p;
+	if (get_task_list_tail() == pcb) 
+		set_task_list_tail(p);
 	kfree(pcb);
 	schedule();
 }

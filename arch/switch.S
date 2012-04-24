@@ -41,6 +41,7 @@ context_switch:
 
 
 .global cur_pcb_ptr, nxt_pcb_ptr
+
 .data
 cur_pcb_ptr:
 	.word 0x00000000

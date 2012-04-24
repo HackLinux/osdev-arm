@@ -13,4 +13,5 @@ typedef struct context {
 
 void exit_thread();
 int create_thread(int (*thread_fn)());
+pcontext *get_current();
 #endif

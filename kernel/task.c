@@ -10,6 +10,10 @@ static pcontext *head = 0;
 static pcontext *tail = 0;
 static int num_threads = 0;
 
+inline int thread_count()
+{
+	return num_threads;
+}
 pcontext *set_task_list_head(pcontext *pcb)
 {
 	head = pcb;
@@ -30,7 +34,7 @@ void set_current(pcontext *pcb)
 	cur_pcb = pcb;
 }
 
-pcontext * get_current()
+pcontext *get_current()
 {
 	return cur_pcb;
 }
@@ -58,9 +62,8 @@ pcontext *get_pcb_with_pid(int id)
 	
 }
 
-int create_thread(int (*thread_fn)())
+pcontext *common_thread_create(int pid, int (*thread_fn)())
 {
-	int pid;
 	pcontext *pcb;
 	/* copy all registers, 
  	 * and set the pc and lr to thread_fn
@@ -70,16 +73,28 @@ int create_thread(int (*thread_fn)())
 
 	pcb = kmalloc(sizeof(pcontext));
 	printk("After malloc\n");
-	pid = get_free_pid();
-	if (pid == -1) {
-		return 0;
-	}
-	
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
+	return pcb;	
+
+}
+int create_idle_thread(int (*thread_fn)())
+{
+	pcontext *pcb =	common_thread_create(0, thread_fn);
+	head = tail = pcb;
+	head->next = head->prev = head;
+	tail->next = tail->prev = tail;
+}
+
+int create_thread(int (*thread_fn)())
+{
+	int pid = get_free_pid();
+	if (pid == -1)
+		return 0;	
 	/* disable interrupts */
+	pcontext *pcb =	common_thread_create(pid, thread_fn);
 	pcontext *t = get_task_list_tail();
 	pcb->next = t->next;
 	pcb->prev = t;

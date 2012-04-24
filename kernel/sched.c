@@ -9,6 +9,9 @@
  * 4. 
  */
 
+extern int context_switch_req;
+extern int cur_pcb_ptr, nxt_pcb_ptr;
+
 void schedule()
 {
 	pcontext *curr, *next;
@@ -21,12 +24,18 @@ void schedule()
  	*  	context switch
 	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
+	if (thread_count() == 1)
+		return;
 
+	cur_pcb_ptr = (int)get_current();
+	nxt_pcb_ptr = (int)(get_current()->next);
+	context_switch_req = 1;
+	
 }
 
 void scheduler_init()
 {
-	set_current(get_pcb_with_pid(0));
+/*	set_current(get_pcb_with_pid(0));
 	set_task_list_head(get_current());
-	set_task_list_tail(get_current());
+	set_task_list_tail(get_current());*/
 }

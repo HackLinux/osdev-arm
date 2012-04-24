@@ -3,18 +3,6 @@
 #include "malloc.h"
 #include "funcs.h"
 
-typedef struct context {
-/*	int reg[16]; */
-	int r0, r1, r2, r3;
-	int r4, r5, r6, r7, r8;
-	int r9, r10, r11, r12;
-	int sp, lr, pc;
-	int pid;
-	unsigned char stack[STACK_SIZE];
-	struct context *next;
-	unsigned int in_use;
-}pcontext;
-
 static pcontext *pid_array[MAX_THREADS];
 
 static pcontext *cur_pcb = 0;
@@ -72,7 +60,6 @@ int create_thread(int (*thread_fn)())
 	
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
-	pcb->sp = (long)pcb->stack + sizeof(pcb->stack)-1;
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
 	mark_pid(pid, pcb);

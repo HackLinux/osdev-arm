@@ -34,6 +34,7 @@ swi_vec:
 	stmfd sp!,{r0-r3,lr}
 	mov lr,pc
 	ldr pc,=syscall
+	/* check for context switch flag, if set call context, switch */
 	ldmfd sp!,{r0-r3,pc}^
 
 abort_data_vec:
@@ -47,21 +48,22 @@ reserved_vec:
 
 irq_vec:
 	subs lr, lr, #4
-	stmfd sp!, {r0-r3, lr}
+	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =irq_handler
-	ldmfd sp!, {r0-r3, pc}^ 
+	/* check for context switch flag, if set call context, switch */
+	ldmfd sp!, {r0-r12, pc}^ 
 
 fiq_vec:
 	subs lr, lr, #4
-	stmfd sp!, {r0-r3, lr}
+	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =fiq_handler
-	ldmfd sp!, {r0-r3, pc}^
+	ldmfd sp!, {r0-r12, pc}^
 
 
-.global offset
+.global context_switch_req
 .data
-offset :
+context_switch_req:
 	.word 0x00000000
 

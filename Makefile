@@ -49,6 +49,12 @@ cscope:
 	cscope -b -k -q
 clean:
 	rm -rf $(objdir) final final.bin final.map
+	
 
+clean_cscope:
+	rm -rf cscope.*
+
+mrproper: clean clean_cscope
+	
 run:
 	qemu-system-arm -M versatilepb

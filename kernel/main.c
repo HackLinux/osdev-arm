@@ -37,7 +37,7 @@ int idle_thread()
 {
 	printk("In idle thread\n");
 	while (1) {
-		sleep(2000);
+		sleep(5000);
 		printk("Running idle thread\n");
 	}
 }

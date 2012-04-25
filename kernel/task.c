@@ -83,9 +83,11 @@ pcontext *common_thread_create(int pid, int (*thread_fn)())
 int create_idle_thread(int (*thread_fn)())
 {
 	pcontext *pcb =	common_thread_create(0, thread_fn);
+	mark_pid(0, pcb);
 	head = tail = pcb;
 	head->next = head->prev = head;
 	tail->next = tail->prev = tail;
+	num_threads++;
 }
 
 int create_thread(int (*thread_fn)())

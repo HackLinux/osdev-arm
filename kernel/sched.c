@@ -35,7 +35,7 @@ void schedule()
 
 void scheduler_init()
 {
-/*	set_current(get_pcb_with_pid(0));
-	set_task_list_head(get_current());
+	set_current(get_pcb_with_pid(0));
+/*	set_task_list_head(get_current());
 	set_task_list_tail(get_current());*/
 }

@@ -7,10 +7,6 @@
 .global context_switch
 
 context_switch:
-/* eg, r13 = 100, 	
-	40- > r0, 96->r14
-	32 -> spsr, 36 -> lr (pc)
-*/
 	ldmfd sp!, {r0-r12, lr}
 	ldr r13, =cur_pcb_ptr	
 	ldr r13, [r13]

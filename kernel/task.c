@@ -29,6 +29,11 @@ pcontext *get_task_list_tail()
 	return tail;
 }
 
+pcontext *get_task_list_head()
+{
+	return head;
+}
+
 void set_current(pcontext *pcb)
 {
 	cur_pcb = pcb;
@@ -77,6 +82,7 @@ pcontext *common_thread_create(int pid, int (*thread_fn)())
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
+	pcb->spsr = get_cpsr();
 	return pcb;	
 
 }
@@ -86,7 +92,6 @@ int create_idle_thread(int (*thread_fn)())
 	mark_pid(0, pcb);
 	head = tail = pcb;
 	head->next = head->prev = head;
-	tail->next = tail->prev = tail;
 	num_threads++;
 }
 
@@ -98,9 +103,12 @@ int create_thread(int (*thread_fn)())
 	/* disable interrupts */
 	pcontext *pcb =	common_thread_create(pid, thread_fn);
 	pcontext *t = get_task_list_tail();
+	pcontext *h = get_task_list_head();
 	pcb->next = t->next;
 	pcb->prev = t;
 	t->next = pcb;
+	h->prev = pcb;
+	
 	set_task_list_tail(pcb);
 	num_threads++;
 	/* enable interrupts */

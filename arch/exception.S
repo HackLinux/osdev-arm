@@ -57,9 +57,11 @@ irq_vec:
 	/* check for context switch flag, if set call context, switch, which will never return 
 	 * so dont save the link register
 	 */
+	ldr r2, =context_switch
 	ldr r0, =context_switch_req
+	ldr r0, [r0]
 	cmp r0, #1
-	beq context_switch
+	moveq pc,r2
 	ldmfd sp!, {r0-r12, pc}^ 
 
 fiq_vec:
@@ -68,7 +70,6 @@ fiq_vec:
 	mov lr, pc
 	ldr pc, =fiq_handler
 	ldmfd sp!, {r0-r12, pc}^
-
 
 .global context_switch_req
 .data

@@ -37,15 +37,15 @@ int idle_thread()
 {
 	printk("In idle thread\n");
 	while (1) {
-//		sleep(5000);
+		sleep(5000);
 		printk("Running idle thread\n");
 	}
 }
 int normal_thread()
 {
-	printk("Normal thread");
+	printk("Normal thread\n");
 	while (1) {
-//		sleep(5000);
+		sleep(5000);
 		printk("Running normal thread\n");
 	}
 }
@@ -74,8 +74,8 @@ int main()
 	create_thread(normal_thread);
 	scheduler_init();
 	__asm__ __volatile__("msr cpsr_c, #0x10");
-	change_mode(USR_MODE);
-	log_info_str("In user space\n");
+//	log_info_str("In user space\n");
+//	change_mode(USR_MODE);
 	idle_thread();
 	/* we shall never return here */
 	/* end of world */

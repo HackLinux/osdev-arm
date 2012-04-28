@@ -31,22 +31,40 @@ void parse_args(const char *args)
 {
 	printk("cmd line = %s\n", args);
 }
+void busy_loop1()
+{
+	unsigned int i, j, k;
+	for (i = 0; i < (0xffffffff) ; i++)
+		for (j = 0; j < (0xffffffff); j++)
+			for (k = 0; k < (0xffffffff); k++);
 
+}
+
+void busy_loop2()
+{
+	unsigned int i, j, k;
+//	for (i = 0; i < (0xffffffff) ; i++)
+//		for (j = 0; j < (0xffffffff); j++)
+			for (k = 0; k < (1<<26); k++);
+
+}
 
 int idle_thread()
 {
 	printk("In idle thread\n");
+	int i=0;
 	while (1) {
 		sleep(5000);
-		printk("Running idle thread\n");
+		printk("Running idle thread, %d\n", i++);
 	}
 }
 int normal_thread()
 {
 	printk("Normal thread\n");
+	int i = 0;
 	while (1) {
-		sleep(5000);
-		printk("Running normal thread\n");
+		sleep(1000);
+		printk("Running normal thread, %d\n", i++);
 	}
 }
 int main()

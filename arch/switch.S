@@ -15,24 +15,30 @@ context_switch:
 			      if we use pc and the last argument to ^, then spsr is copied to cpsr otherwise
 			      the registers of the saved spsr and temporarily masked for the duration of operation*/	
 	
-	add r13, r13, #60	
+	add r13, r13, #68	
 	mrs  r0, spsr	      /* get the spsr register of current task */
 	stmdb r13, {r0, lr}   /* copy the spsr and LR i.e the return address of task, no need of ^	*/
 
 	/* current context is saved */
 	/* now restore the next task context */
 
+	mov r13, #0x23000
+	bl move_cur_pcb
+	
 	ldr r13, =nxt_pcb_ptr
 	ldr r13, [r13]
 
 	add r13, r13, #60
-	ldmia r13, {r0, lr}
+	ldm r13, {r0, lr}
 
 	msr spsr_cxsf, r0
 
 	sub r13, r13, #60
 	ldmia r13, {r0-r14}^
-	
+
+	/* update the set_current */	
+	/* restore r13 of irq stack */
+	mov r13, #0x23000
 	movs pc, r14
 
 

@@ -24,13 +24,19 @@ void schedule()
  	*  	context switch
 	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
-	if (thread_count() == 1)
-		return;
+	//if (thread_count() == 1)
+	//	return;
 
 	cur_pcb_ptr = (int)get_current();
 	nxt_pcb_ptr = (int)(get_current()->next);
 	context_switch_req = 1;
 	
+}
+void move_cur_pcb()
+{
+	cur_pcb_ptr = nxt_pcb_ptr;
+	set_current(cur_pcb_ptr);
+
 }
 
 void scheduler_init()

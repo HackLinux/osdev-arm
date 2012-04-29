@@ -63,32 +63,36 @@ void print_timer_values(int count)
  *|____|  |___|   |___|	   |___| 
  */
 
-unsigned int rem_jiffies[20] = {0};
+static volatile unsigned int rem_jiffies[20] = {0};
 int timers_cnt = 0;
 #define HZ 1
 #define JIFFY 1000/HZ
 /* 1 jiffy = 10 msecs*/
-void sleep(int msecs)
+void sleep(int msecs, int mine)
 {
-	unsigned int mine = -1;
+//	unsigned int mine = -1;
 	int i;
+	/*
 	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) {
 		if (!rem_jiffies[i]) {
 			mine = i;
 			rem_jiffies[i] = msecs / (JIFFY);
 			break;
 		}
-	}
-	if (mine != -1)
-		while (rem_jiffies[mine]);
+	}*/
+	rem_jiffies[mine] = msecs / (JIFFY);
+//	if (mine != -1)
+	while (rem_jiffies[mine]);
 }
 
 void call_handlers()
 {
 	int i;
+//	printk("0 -> %d \t 1 -> %d \n", rem_jiffies[0], rem_jiffies[1]);
 	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) 
-		if (rem_jiffies[i]) 
+		if (rem_jiffies[i]) { 
 			rem_jiffies[i]--;
+		}
 
 }
 int timer_handler(int irq, void *data)

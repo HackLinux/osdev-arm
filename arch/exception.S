@@ -59,8 +59,10 @@ irq_vec:
 	 */
 	ldr r2, =context_switch
 	ldr r0, =context_switch_req
-	ldr r0, [r0]
-	cmp r0, #1
+	mov r4, #0
+	ldr r3, [r0]
+	cmp r3, #1
+	str r4, [r0] 
 	moveq pc,r2
 	ldmfd sp!, {r0-r12, pc}^ 
 

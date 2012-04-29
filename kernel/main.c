@@ -40,12 +40,12 @@ void busy_loop1()
 
 }
 
-void busy_loop2()
+void busy_loop2(int loops)
 {
 	unsigned int i, j, k;
 //	for (i = 0; i < (0xffffffff) ; i++)
 //		for (j = 0; j < (0xffffffff); j++)
-			for (k = 0; k < (1<<26); k++);
+			for (k = 0; k < (1<<loops); k++);
 
 }
 
@@ -54,7 +54,7 @@ int idle_thread()
 	printk("In idle thread\n");
 	int i=0;
 	while (1) {
-		sleep(5000);
+		sleep(1000, 0);
 		printk("Running idle thread, %d\n", i++);
 	}
 }
@@ -63,7 +63,7 @@ int normal_thread()
 	printk("Normal thread\n");
 	int i = 0;
 	while (1) {
-		sleep(1000);
+		sleep(5000, 1);
 		printk("Running normal thread, %d\n", i++);
 	}
 }
@@ -89,11 +89,11 @@ int main()
 	} 
 */
 	create_idle_thread(idle_thread);
-	create_thread(normal_thread);
 	scheduler_init();
 	__asm__ __volatile__("msr cpsr_c, #0x10");
 //	log_info_str("In user space\n");
 //	change_mode(USR_MODE);
+	create_thread(normal_thread);
 	idle_thread();
 	/* we shall never return here */
 	/* end of world */

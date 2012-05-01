@@ -24,7 +24,6 @@ void schedule()
  	*  	context switch
 	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
-	printk("context switch req flag = %d\n", context_switch_req);
 	if (thread_count() == 1)
 		return;
 

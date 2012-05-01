@@ -65,6 +65,7 @@ int normal_thread()
 	while (1) {
 		sleep(5000, 1);
 		printk("Running normal thread, %d\n", i++);
+		log_info_str("In space\n");
 	}
 }
 int main()
@@ -88,12 +89,14 @@ int main()
 		generate_software_interrupt(4);
 	} 
 */
-	create_idle_thread(idle_thread);
+	create_idle_thread(idle_thread, 0x113);
 	scheduler_init();
-	__asm__ __volatile__("msr cpsr_c, #0x10");
-//	log_info_str("In user space\n");
+//	__asm__ __volatile__("msr cpsr_c, #0x10");
+	log_info_str("In main space\n");
 //	change_mode(USR_MODE);
-	create_thread(normal_thread);
+	create_thread(normal_thread, 0x110);
+//	__asm__ __volatile__("msr cpsr_c, #0x11");
+	log_info_str("In main space\n");
 	idle_thread();
 	/* we shall never return here */
 	/* end of world */

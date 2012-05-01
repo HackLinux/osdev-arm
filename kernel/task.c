@@ -67,7 +67,7 @@ pcontext *get_pcb_with_pid(int id)
 	
 }
 
-pcontext *common_thread_create(int pid, int (*thread_fn)())
+pcontext *common_thread_create(int pid, int (*thread_fn)(), unsigned int mode)
 {
 	pcontext *pcb;
 	/* copy all registers, 
@@ -82,26 +82,27 @@ pcontext *common_thread_create(int pid, int (*thread_fn)())
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
-	pcb->spsr = get_cpsr();
+	pcb->spsr = mode;
+//	pcb->spsr = get_cpsr();
 	return pcb;	
 
 }
-int create_idle_thread(int (*thread_fn)())
+int create_idle_thread(int (*thread_fn)(), unsigned int mode)
 {
-	pcontext *pcb =	common_thread_create(0, thread_fn);
+	pcontext *pcb =	common_thread_create(0, thread_fn, mode);
 	mark_pid(0, pcb);
 	head = tail = pcb;
 	head->next = head->prev = head;
 	num_threads++;
 }
 
-int create_thread(int (*thread_fn)())
+int create_thread(int (*thread_fn)(), unsigned mode)
 {
 	int pid = get_free_pid();
 	if (pid == -1)
 		return 0;	
 	/* disable interrupts */
-	pcontext *pcb =	common_thread_create(pid, thread_fn);
+	pcontext *pcb =	common_thread_create(pid, thread_fn, mode);
 	pcontext *t = get_task_list_tail();
 	pcontext *h = get_task_list_head();
 	pcb->next = t->next;

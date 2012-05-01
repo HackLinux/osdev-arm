@@ -12,6 +12,7 @@ typedef struct context {
 
 
 void exit_thread();
-int create_thread(int (*thread_fn)());
+int create_thread(int (*thread_fn)(), unsigned int mode);
+int create_idle_thread(int (*thread_fn)(), unsigned int mode);
 pcontext *get_current();
 #endif

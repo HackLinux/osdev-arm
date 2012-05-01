@@ -1,0 +1,2 @@
+each task should have its own stack pointer, important
+each mode will have their own stacks 

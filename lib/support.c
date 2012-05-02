@@ -13,7 +13,7 @@ static char modes[4][4] 	= {
 #define get_mode(m) str_mode[modes[m&0x3][(m&0x6)>>2]]
 static char buf[120];
 
-char * get_cpsr_info()
+char *get_cpsr_info()
 {
 	int a;
 	char *ptr = buf;
@@ -24,7 +24,7 @@ char * get_cpsr_info()
 	strcpy(buf, ptr);
 	return buf;
 }
-char * asm_log_info()
+char *asm_log_info()
 {
 	log_info();
 }

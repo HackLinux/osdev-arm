@@ -82,6 +82,7 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), unsigned int mode)
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
+	pcb->sp = pcb->stack_top;
 	pcb->spsr = mode;
 //	pcb->spsr = get_cpsr();
 	return pcb;	

@@ -3,7 +3,7 @@
 #include "types.h"
 
 #define log_info_str(str,...) \
-			printk("%s:%s:%d:%s: "#str, __FILE__, __func__, __LINE__,get_cpsr_info(),##__VA_ARGS__);
+			printk("%s:%s:%d:%s: "#str"\n", __FILE__, __func__, __LINE__,get_cpsr_info(),##__VA_ARGS__);
 //			printk(str, ##__VA_ARGS__);
 #define log_info() printk("%s:%s:%d: %s\n", __FILE__, __func__, __LINE__, get_cpsr_info())
 void *memcpy(void *dest, const void *src, size_t n);

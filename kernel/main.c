@@ -55,7 +55,7 @@ int idle_thread()
 	int i=0;
 	while (1) {
 		sleep(1000, 0);
-		printk("Running idle thread, %d\n", i++);
+		log_info_str(Running idle thread %d, i++);
 	}
 }
 int normal_thread()
@@ -64,8 +64,7 @@ int normal_thread()
 	int i = 0;
 	while (1) {
 		sleep(5000, 1);
-		printk("Running normal thread, %d\n", i++);
-		log_info_str("In space\n");
+		log_info_str(Running normal thread %d, i++);
 	}
 }
 int main()
@@ -78,25 +77,31 @@ int main()
 	timer_init();
 	mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 
-	//	generate_software_interrupt(2);
+#if 0
+	generate_software_interrupt(2);
 	
-	//log_info();
+	log_info();
 	int j;
-/*
 	request_irq(4, IRQ_MODE, my_handler, 0); 
 	for( i =1 ; i < 10; i++) {
 		printk("hello %d \n", i);
 		generate_software_interrupt(4);
 	} 
-*/
+#endif
 	create_idle_thread(idle_thread, 0x113);
 	scheduler_init();
-//	__asm__ __volatile__("msr cpsr_c, #0x10");
-	log_info_str("In main space\n");
-//	change_mode(USR_MODE);
+#if 0
+	__asm__ __volatile__("msr cpsr_c, #0x10");
+#endif
+	log_info_str(In main space);
+#if 0
+	change_mode(USR_MODE);
+#endif
 	create_thread(normal_thread, 0x110);
-//	__asm__ __volatile__("msr cpsr_c, #0x11");
-	log_info_str("In main space\n");
+#if 0
+	__asm__ __volatile__("msr cpsr_c, #0x11");
+#endif
+	log_info_str(In main space %d, 3);
 	idle_thread();
 	/* we shall never return here */
 	/* end of world */

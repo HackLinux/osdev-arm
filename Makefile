@@ -1,8 +1,8 @@
 
 
 
-CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude
-#-DDEBUG
+CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude -Wall 
+#-DDEBUG 
 CROSS    ?=  arm-none-linux-gnueabi-
 
 LINKER_DIR = linker

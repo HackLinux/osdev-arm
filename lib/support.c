@@ -24,7 +24,7 @@ char *get_cpsr_info()
 	strcpy(buf, ptr);
 	return buf;
 }
-char *asm_log_info()
+void asm_log_info()
 {
 	log_info();
 }

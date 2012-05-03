@@ -1,6 +1,8 @@
-#include "funcs.h"
+#include "print.h"
+#include "support.h"
 int a = 0x12345;
 
+int console_write(const char *);
 void syscall(int no)
 {
 	log_info_str("In  syscall: %d \n", no);

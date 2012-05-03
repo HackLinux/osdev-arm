@@ -110,6 +110,7 @@ buddy *split_node(buddy *n)
 	init_node(n->rchild, n->size - sizeof(buddy), n->offset + n->size + sizeof(buddy), n, n->lchild, 0, 0);
 
 	n->size = n->lchild->size;
+	return n->lchild; 
 }
 
 void update_parent(buddy *n)

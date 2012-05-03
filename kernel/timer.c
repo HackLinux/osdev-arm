@@ -1,5 +1,6 @@
 #include "print.h"
 #include "interrupt.h"
+#include "sched.h"
 /* SP 804 */
 
 /*registers*/
@@ -42,6 +43,7 @@ inline unsigned int get_timer_base(int index)
 	case 3:
 		return TIMER_BASE_3;
 	}
+	return -1;
 }
 void print_timer_values(int count)
 {
@@ -70,6 +72,7 @@ int timers_cnt = 0;
 /* 1 jiffy = 10 msecs*/
 void sleep(int msecs, int mine)
 {
+#if 0
 //	unsigned int mine = -1;
 	int i;
 	/*
@@ -80,6 +83,7 @@ void sleep(int msecs, int mine)
 			break;
 		}
 	}*/
+#endif
 	rem_jiffies[mine] = msecs / (JIFFY);
 //	if (mine != -1)
 	while (rem_jiffies[mine]);
@@ -103,6 +107,7 @@ int timer_handler(int irq, void *data)
 	//printk("timer called\n");
 	call_handlers();
 	schedule();
+	return 0;
 }
 
 
@@ -139,7 +144,7 @@ void timer_init()
 
 	request_irq(4, IRQ_MODE, timer_handler, 0); 
 	tbase[TIMER_CNTL] |= TIMER_ENABLE|TIMER_INT_EN;
-	dprintk("Timer value = %d, irstatus = %d, timer_ctrl = %x \n", tbase[TIMER_VALUE], tbase[TIMER_INTR_STATUS], tbase[TIMER_CNTL]);
+	printk("Timer value = %d, irstatus = %d, timer_ctrl = %x \n", tbase[TIMER_VALUE], tbase[TIMER_INTR_STATUS], tbase[TIMER_CNTL]);
 
 	printk("Timer initialization done \n");
 	

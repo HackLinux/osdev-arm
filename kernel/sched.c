@@ -14,7 +14,6 @@ extern int cur_pcb_ptr, nxt_pcb_ptr;
 
 void schedule()
 {
-	pcontext *curr, *next;
 	//printk("scheduler called \n");
 	/* 1. num of ready tasks == 1 , i.e idle thread running, so dont bother, return back
  	*  2. num of ready taks > 1, round robin, pick next task
@@ -35,7 +34,7 @@ void schedule()
 void move_cur_pcb()
 {
 	cur_pcb_ptr = nxt_pcb_ptr;
-	set_current(cur_pcb_ptr);
+	set_current((pcontext *)cur_pcb_ptr);
 
 }
 

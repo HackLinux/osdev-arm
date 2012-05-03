@@ -16,5 +16,13 @@ struct IRQ_LIST {
 };
 
 int request_irq(int irq, int type, int (*intr_handler)(int irq, void *data), void *data);
+void disable_cpsr_irq();
+void disable_cpsr_fiq();
+void enable_cpsr_fiq();
+void enable_cpsr_irq();
+void gen_soft_irq(int);
+void enable_irq(int);
+void enable_fiq(int);
+void clear_soft_irq(int);
 
 #endif

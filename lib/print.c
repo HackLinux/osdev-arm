@@ -46,11 +46,11 @@ static int parse_hex(unsigned int value, int width)
 {
 	if (!width) width= 8;
 	int i = width-2;
-	int set = 0;
 	buf[ptr++] = '0';
 	buf[ptr++] = 'x';
 	
 #if 0
+	int set = 0;
 	while (i-- > 0) {
 		if (!set && !((value>>(i * 4)) & 0xf)) 
 			continue;
@@ -69,11 +69,9 @@ static int parse_hex(unsigned int value, int width)
 
 int get_log_level(const char **pbuf)
 {
-	char *p;
+	char *p = *(char **)pbuf;
 	int log_level = 0;	
-
 	if(*p) {
-		p = *(char **)pbuf;
 		if( p[0] == '<' && p[1] >= '0' && p[1] <= '7' && p[2] == '>') {
 			log_level = p[1] - '0';
 			*pbuf += 3;
@@ -85,6 +83,7 @@ int get_log_level(const char **pbuf)
 
 #define is_digit(c) ((c) >= '0' && (c) <= '9')
 
+#if 0
 static int skip_atoi(const char *s, int *j)
 {
     int i=0;
@@ -97,7 +96,7 @@ static int skip_atoi(const char *s, int *j)
 	}
     return i;
 }
-
+#endif
 static int con_write_enabled = 1;
 
 void disable_con_write()
@@ -117,7 +116,7 @@ char * printk(const char *fmt, ...)
 {
 	int i = 0;
 	char *s;
-	int log_level;
+	//int log_level;
 
 #if 0
 	/* must be the same size as enum KP_LEVEL */

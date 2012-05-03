@@ -10,7 +10,7 @@
 #define UND_MODE  0x1b
 
 
-static inline change_mode(int mode)
+static inline void change_mode(int mode)
 {
 	__asm__ __volatile__("msr cpsr_c, %0"::"r"(mode):);
 }

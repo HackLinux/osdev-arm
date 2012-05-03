@@ -2,6 +2,9 @@
 #include "interrupt.h"
 #include "task.h"
 #include "processor.h"
+#include "print.h"
+#include "support.h"
+#include "syscall.h"
 
 int print(char *s);
 void setup_idt();
@@ -10,8 +13,12 @@ int arr[200];
 extern int bss_start;
 extern int bss_end;
 extern int mem_start;
-int timer_handler(int irq, void *data);
 
+
+void arch_init();
+void timer_init();
+void mem_init();
+void scheduler_init();
 
 void bss_init()
 {
@@ -19,53 +26,31 @@ void bss_init()
 	memset(&bss_start, 0, &bss_end - &bss_start);
 } 
 
-int my_handler(int irqno, void *data)
-{
-	printk("%s :received : %d\n", __func__, irqno);
-	clear_soft_irq(1<<irqno);
-}
-
-void print_timer_values(int);
 
 void parse_args(const char *args)
 {
 	printk("cmd line = %s\n", args);
 }
-void busy_loop1()
-{
-	unsigned int i, j, k;
-	for (i = 0; i < (0xffffffff) ; i++)
-		for (j = 0; j < (0xffffffff); j++)
-			for (k = 0; k < (0xffffffff); k++);
-
-}
-
-void busy_loop2(int loops)
-{
-	unsigned int i, j, k;
-//	for (i = 0; i < (0xffffffff) ; i++)
-//		for (j = 0; j < (0xffffffff); j++)
-			for (k = 0; k < (1<<loops); k++);
-
-}
 
 int idle_thread()
 {
-	printk("In idle thread\n");
+	printk("In idle thread: %d\n", get_pid());
 	int i=0;
 	while (1) {
-		sleep(1000, 0);
-		log_info_str(Running idle thread %d, i++);
+		sleep(1000, get_pid());
+		log_info_str(Running %s: %d, get_task_name(), i++);
 	}
+	return 0;
 }
 int normal_thread()
 {
-	printk("Normal thread\n");
+	printk("Normal thread %d\n", get_pid());
 	int i = 0;
 	while (1) {
-		sleep(5000, 1);
-		log_info_str(Running normal thread %d, i++);
+		sleep(5000, get_pid());
+		log_info_str(Running %s: pid = %d %d, get_task_name(), get_pid(), i++);
 	}
+	return 0;
 }
 int main()
 {
@@ -77,18 +62,7 @@ int main()
 	timer_init();
 	mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 
-#if 0
-	generate_software_interrupt(2);
-	
-	log_info();
-	int j;
-	request_irq(4, IRQ_MODE, my_handler, 0); 
-	for( i =1 ; i < 10; i++) {
-		printk("hello %d \n", i);
-		generate_software_interrupt(4);
-	} 
-#endif
-	create_idle_thread(idle_thread, 0x113);
+	create_idle_thread(idle_thread, "idle", 0x113);
 	scheduler_init();
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x10");
@@ -97,7 +71,8 @@ int main()
 #if 0
 	change_mode(USR_MODE);
 #endif
-	create_thread(normal_thread, 0x110);
+	create_thread(normal_thread, "normal_thread", 0x110);
+	create_thread(normal_thread, "normal_thread", 0x110);
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x11");
 #endif
@@ -106,15 +81,15 @@ int main()
 	/* we shall never return here */
 	/* end of world */
 	
-	int count = 0;
 	 __asm__ __volatile__("swi #10"::);
 	
 	printk("into user land\n");
 	
 	while(1) {
 		printk("sleep for 2 secs\n");
-		sleep(2000);
+		sleep(2000, 10);
 	}
+	return 0;
 }
 
 void msg()

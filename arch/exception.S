@@ -35,8 +35,9 @@ swi_vec:
 	# read the swi instruction
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
-	bic r0, r0, #0xff000000
+	bic r10, r10, #0xff000000
 	mov lr,pc
+	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
 	bl check_context_switch  
 	ldmfd sp!,{r0-r12,pc}^

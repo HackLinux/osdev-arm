@@ -39,6 +39,7 @@ int idle_thread()
 	while (1) {
 		sleep(1000, get_pid());
 		log_info_str(Running %s: %d, get_task_name(), i++);
+		//printk("Running %s: %d\n", get_task_name(), i++);
 	}
 	return 0;
 }
@@ -47,8 +48,10 @@ int normal_thread()
 	printk("Normal thread %d\n", get_pid());
 	int i = 0;
 	while (1) {
-		sleep(5000, get_pid());
+		sleep(1000, get_pid());
 		log_info_str(Running %s: pid = %d %d, get_task_name(), get_pid(), i++);
+	 	__asm__ __volatile__("swi #10"::);
+		printk("back to user space id = %d\n", get_pid());
 	}
 	return 0;
 }
@@ -62,7 +65,7 @@ int main()
 	timer_init();
 	mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 
-	create_idle_thread(idle_thread, "idle", 0x113);
+	create_idle_thread(idle_thread, "idle", 0x11f);
 	scheduler_init();
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x10");
@@ -72,11 +75,13 @@ int main()
 	change_mode(USR_MODE);
 #endif
 	create_thread(normal_thread, "normal_thread", 0x110);
-	create_thread(normal_thread, "normal_thread", 0x110);
+//	create_thread(normal_thread, "normal_thread", 0x110);
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x11");
 #endif
 	log_info_str(In main space %d, 3);
+	__asm__ __volatile__("msr cpsr_c, #0x1f");
+//	change_mode(SYS_MODE);
 	idle_thread();
 	/* we shall never return here */
 	/* end of world */

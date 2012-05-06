@@ -88,7 +88,6 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 		return 0;
 
 	pcb = kmalloc(sizeof(pcontext));
-	printk("After malloc\n");
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;

@@ -1,5 +1,6 @@
 #include "funcs.h"
 #include "print.h"
+#include "support.h"
 
 char str_mode[][4] 	= {"", "abt", "fiq",  "irq", "svc", "sys", "und", "usr"}; 
 #if 1
@@ -10,7 +11,7 @@ static char modes[4][4] 	= {
 			{4, 1, 6, 5},
 			};
 #endif
-#define get_mode(m) str_mode[modes[m&0x3][(m&0x6)>>2]]
+#define get_mode(m) str_mode[modes[(m)&0x3][((m)&0xc)>>2]]
 static char buf[120];
 
 char *get_cpsr_info()

@@ -9,12 +9,13 @@
  * 4. 
  */
 
-extern int context_switch_req;
+//extern int context_switch_req;
 extern int cur_pcb_ptr, nxt_pcb_ptr;
+int context_switch_req;
 
 void schedule()
 {
-	//printk("scheduler called \n");
+//	printk("scheduler called \n");
 	/* 1. num of ready tasks == 1 , i.e idle thread running, so dont bother, return back
  	*  2. num of ready taks > 1, round robin, pick next task
  	*  3. 

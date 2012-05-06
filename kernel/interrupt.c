@@ -21,7 +21,7 @@ int handle_generic_IRQ(int irq_status)
 {
 	int i;
 	int interrupt;
-	printk("%s handler ,received interrupt  with irq_status: %x\n", __func__, irq_status);
+	dprintk("%s handler ,received interrupt  with irq_status: %x\n", __func__, irq_status);
 	for (i = 0; i < MAX_IRQ; i++) {
 		interrupt = 1<<i;
 		if (irq_status & interrupt) {

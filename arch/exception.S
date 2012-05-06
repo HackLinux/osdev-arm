@@ -31,14 +31,15 @@ undefined_vec:
 	b undefined_vec
 
 swi_vec:
-	stmfd sp!,{r0-r3,lr}
+	stmfd sp!,{r0-r12,lr}
+	# read the swi instruction
+	ldr r0, [lr, #-4]
+	# mask of the top 8 bits
+	bic r0, r0, #0xff000000
 	mov lr,pc
 	ldr pc,=syscall
-	/* check for context switch flag, if set call context, switch */
-	ldr r0, =context_switch_req
-	cmp r0, #1
-	beq context_switch
-	ldmfd sp!,{r0-r3,pc}^
+	bl check_context_switch  
+	ldmfd sp!,{r0-r12,pc}^
 
 abort_data_vec:
 	b abort_data_vec
@@ -54,16 +55,7 @@ irq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =irq_handler
-	/* check for context switch flag, if set call context, switch, which will never return 
-	 * so dont save the link register
-	 */
-	ldr r2, =context_switch
-	ldr r0, =context_switch_req
-	mov r4, #0
-	ldr r3, [r0]
-	cmp r3, #1
-	str r4, [r0] 
-	moveq pc,r2
+	bl check_context_switch 
 	ldmfd sp!, {r0-r12, pc}^ 
 
 fiq_vec:
@@ -71,10 +63,26 @@ fiq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =fiq_handler
+	bl check_context_switch 
 	ldmfd sp!, {r0-r12, pc}^
 
+
+check_context_switch:
+/* check for context switch flag, if set call context, switch, which will never return 
+	 * so dont save the link register
+	 */
+	ldr r2, =context_switch
+	ldr r0, =context_switch_req
+	mov r4, #0
+	ldr r3, [r0]
+	str r4, [r0] 
+	cmp r3, #1
+	moveq pc,r2	/* never returns back */
+	mov pc, lr
+	
+/*
 .global context_switch_req
 .data
 context_switch_req:
 	.word 0x00000000
-
+*/

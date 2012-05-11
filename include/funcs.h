@@ -1,5 +1,5 @@
-#ifndef _FUNCS_H
-#define _FUNCS_H
+#ifndef __FUNCS_H
+#define __FUNCS_H
 #include "types.h"
 
 void *memcpy(void *dest, const void *src, size_t n);

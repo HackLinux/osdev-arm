@@ -35,9 +35,10 @@ undefined_vec:
    set stack depending on pid
    store registers
    enable interrupts  
-   .... goto syscall 
+   .... process ...swi -->go out
    disable interrupts
    restore registers
+   restore stack to SVC stack
    enable interrupts
    
    
@@ -52,7 +53,7 @@ swi_vec:
 	mov lr,pc
 	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
-	bl check_context_switch  
+	#bl check_context_switch  
 	ldmfd sp!,{r0-r12,pc}^
 
 abort_data_vec:
@@ -69,7 +70,7 @@ irq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =irq_handler
-	bl check_context_switch 
+	#bl check_context_switch 
 	ldmfd sp!, {r0-r12, pc}^ 
 
 fiq_vec:
@@ -77,7 +78,7 @@ fiq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =fiq_handler
-	bl check_context_switch 
+	#bl check_context_switch 
 	ldmfd sp!, {r0-r12, pc}^
 
 

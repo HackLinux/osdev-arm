@@ -3,5 +3,5 @@
 int sys_msleep(int msecs)
 {
 
-
+	return 1;
 }

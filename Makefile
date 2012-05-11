@@ -29,7 +29,7 @@ $(tgt): $(dummy) $(objs)
 	$(CROSS)objcopy -O binary $@ $@.bin
 
 $(objdir)/%.o:%.c
-	$(CROSS)gcc -c $^ $(CFLAGS) -o $@
+	$(CROSS)gcc -c $^ $(CFLAGS) -o $@ 
 
 $(objdir)/%.o:%.S
 	$(CROSS)gcc -c $^ $(CFLAGS) -o $@ 

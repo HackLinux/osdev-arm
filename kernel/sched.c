@@ -32,15 +32,16 @@ void schedule()
 	context_switch_req = 1;
 	
 }
+
 void move_cur_pcb()
 {
 	cur_pcb_ptr = nxt_pcb_ptr;
 	set_current((pcontext *)cur_pcb_ptr);
-
 }
 
 void scheduler_init()
 {
+	printk("in scheduler_init\n");
 	set_current(get_pcb_with_pid(0));
 /*	set_task_list_head(get_current());
 	set_task_list_tail(get_current());*/

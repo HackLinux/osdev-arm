@@ -1,5 +1,5 @@
-#ifndef _LINUX_LINKAGE_H
-#define _LINUX_LINKAGE_H
+#ifndef __LINKAGE_H
+#define __LINKAGE_H
 
 
 #define __page_aligned_data	__section(.data.page_aligned) __aligned(PAGE_SIZE)

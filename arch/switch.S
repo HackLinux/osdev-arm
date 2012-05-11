@@ -5,7 +5,11 @@
 #
 
 .global context_switch
-
+/* new mode of checking 
+. check for mode
+. if irq
+	set the stack_top 
+*/
 context_switch:
 	ldmfd sp!, {r0-r12, lr}
 	ldr r13, =cur_pcb_ptr	

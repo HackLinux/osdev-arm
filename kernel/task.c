@@ -3,6 +3,7 @@
 #include "task.h"
 #include "malloc.h"
 #include "funcs.h"
+#include "support.h"
 
 static pcontext *pid_array[MAX_THREADS];
 
@@ -81,13 +82,19 @@ char *get_task_name()
 pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, unsigned int mode)
 {
 	pcontext *pcb;
+	unsigned int pcb_sz;
 	/* copy all registers, 
  	 * and set the pc and lr to thread_fn
  	 * flags to a storage location */
 	if (num_threads > MAX_THREADS)
 		return 0;
+	pcb_sz = sizeof(pcontext);
 
-	pcb = kmalloc(sizeof(pcontext));
+	//Allocate extra supervisor stack for user tasks
+	if (get_mode(mode) == USR) 
+		pcb_sz += SVC_STACK_SIZE;		
+	
+	pcb = kmalloc(pcb_sz);
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
@@ -97,7 +104,6 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 	strncpy(pcb->name, name, TASK_NAME_SIZE);
 //	pcb->spsr = get_cpsr();
 	return pcb;	
-
 }
 int create_idle_thread(int (*thread_fn)(), const char *name, unsigned int mode)
 {
@@ -114,6 +120,7 @@ int create_thread(int (*thread_fn)(), const char *name, unsigned mode)
 	int pid = get_free_pid();
 	if (pid == -1)
 		return 0;	
+	printk("in create thread %s\n",name);
 	/* disable interrupts */
 	pcontext *pcb =	common_thread_create(pid, thread_fn, name, mode);
 	pcontext *t = get_task_list_tail();

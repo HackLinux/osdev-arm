@@ -7,8 +7,8 @@ int console_write(const char *);
 #define MAX_SYSCALL 10
 static long syscall_table[MAX_SYSCALL+1]= {0};
 
-
-#define void define_syscall(int no, long func)
+#if 0
+#define install_syscall(int no, long func)
 {
 	if (no > MAX_SYSCALL) {
 		printk("syscall beyound allowed range of : %d\n", MAX_SYSCALL);
@@ -17,7 +17,7 @@ static long syscall_table[MAX_SYSCALL+1]= {0};
 	syscall_table[no] = func;
 }
 
-
+#endif
 
 void syscall(int no)
 {

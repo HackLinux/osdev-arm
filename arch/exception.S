@@ -29,18 +29,55 @@ reset_vec:
 
 undefined_vec:
 	b undefined_vec
+/*
+Okay. Here is the problem, 
+	. We are trying to implement syscall which may sleep and hence schedule
+      	. and another case where in syscall, interrupt comes and calls scheduler	
 
-/* switch stack depending on process id  before interrupt
-   disable interrupts
-   set stack depending on pid
-   store registers
-   enable interrupts  
-   .... goto syscall 
-   disable interrupts
-   restore registers
-   enable interrupts
-   
-   
+Assumptions: No nested irqs
+user space => swi => 
+		case 1: swi stores user space regs
+			1.1 then interrupt comes, saves the swi context, context switch happens 
+			then later context switches to the process and goes on
+			1.2 swi is sleeping, call scheduler and context switch
+		case 2: swi did not store the user space regs
+			then interrupt comes, save the swi context, but do not switch the scheduler.
+
+	for case 2: 
+		simply do not context switch, if the prev mode is swi and user regs are not saved,
+		return from irq/fiq/abort will directly go to swi mode and then goes to case 1
+	for case 1:
+		each process maintains a stack, which stores
+
+  ==============================================
+||		  user process 			||	
+		  ------------
+||                   stack top			||	
+||		 ________________		||
+||		|_____user regs__|		||
+||		|_____swi regs___|		||
+||                   				||
+||						||
+  ==============================================
+||		  kernel process		||
+		  --------------
+||		   stack top			||		
+||		 ________________		||
+||		|___kernel regs__|		||
+||		|___swi    regs__|		||
+||						||
+  ==============================================
+
+process stack is shared by both (user & swi) or (kernel & swi)
+context_switch code:
+===================
+while saving if previous mode is swi, 
+	. store user regs in the pcb
+	. store swi regs  in the pcb
+While restoring, if prev mode is swi,
+	. restore swi regs
+	. copy the user regs onto swi stack	
+			
 */
 
 swi_vec:

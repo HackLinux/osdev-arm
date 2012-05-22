@@ -7,8 +7,17 @@
 #define TASK_NAME_SIZE 16
 
 typedef struct context {
-	int r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, sp, lr;
-	int spsr, pc;
+	union {
+		struct regs users{
+			int r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, sp, lr;
+			int spsr, pc;
+		};
+		struct regs swi {
+			int r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, sp, lr;
+			int spsr, pc;
+			int user_spsr, int user_stack, int user_lr;
+		};
+	}
 	int pid;
 	struct context *next, *prev;
 	unsigned int in_use;

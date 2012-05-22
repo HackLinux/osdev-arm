@@ -13,6 +13,13 @@
 extern int cur_pcb_ptr, nxt_pcb_ptr;
 int context_switch_req;
 
+
+/* If prev mode is swi and its sp not equal to swi top then not need to disable schedule*/
+int disable_schedule()
+{
+}
+
+
 void schedule()
 {
 //	printk("scheduler called \n");
@@ -25,6 +32,9 @@ void schedule()
 	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
 	if (thread_count() == 1)
+		return;
+
+	if (disable_schedule())
 		return;
 
 	cur_pcb_ptr = (int)get_current();

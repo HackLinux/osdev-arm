@@ -21,7 +21,7 @@ static long syscall_table[MAX_SYSCALL+1]= {0};
 
 void syscall(int no)
 {
-	log_info_str(In  syscall: %d , no);
+	log_info_str("In  syscall: %d ", no);
 }
 
 void __div0(void)

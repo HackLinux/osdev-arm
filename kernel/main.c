@@ -38,7 +38,7 @@ int idle_thread()
 	int i=0;
 	while (1) {
 		sleep(1000, get_pid());
-		log_info_str(Running %s: %d, get_task_name(), i++);
+		log_info_str("Running %s: %d", get_task_name(), i++);
 		//printk("Running %s: %d\n", get_task_name(), i++);
 	}
 	return 0;
@@ -49,7 +49,7 @@ int normal_thread()
 	int i = 0;
 	while (1) {
 		sleep(1000, get_pid());
-		log_info_str(Running %s: pid = %d %d, get_task_name(), get_pid(), i++);
+		log_info_str("Running %s: pid = %d %d", get_task_name(), get_pid(), i++);
 	 	__asm__ __volatile__("swi #10"::);
 		printk("back to user space id = %d\n", get_pid());
 	}
@@ -70,7 +70,7 @@ int main()
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x10");
 #endif
-	log_info_str(In main space);
+	log_info_str("In main space");
 #if 0
 	change_mode(USR_MODE);
 #endif
@@ -79,7 +79,7 @@ int main()
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x11");
 #endif
-	log_info_str(In main space %d, 3);
+	log_info_str("In main space %d", 3);
 	__asm__ __volatile__("msr cpsr_c, #0x1f");
 //	change_mode(SYS_MODE);
 	idle_thread();

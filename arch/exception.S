@@ -47,14 +47,16 @@ user space => swi =>
 		simply do not context switch, if the prev mode is swi and user regs are not saved,
 		return from irq/fiq/abort will directly go to swi mode and then goes to case 1
 	for case 1:
-		each process maintains a stack, which stores
+		each process maintains a 2-stacks, process stack and svc stack, which stores
 
   ==============================================
 ||		  user process 			||	
 		  ------------
 ||                   stack top			||	
 ||		 ________________		||
-||		|_____user regs__|		||
+||		|_____user regs__|
+		
+		_________________
 ||		|_____swi regs___|		||
 ||                   				||
 ||						||
@@ -64,6 +66,7 @@ user space => swi =>
 ||		   stack top			||		
 ||		 ________________		||
 ||		|___kernel regs__|		||
+		_________________
 ||		|___swi    regs__|		||
 ||						||
   ==============================================
@@ -81,7 +84,9 @@ While restoring, if prev mode is swi,
 */
 
 swi_vec:
-	stmfd sp!,{r0-r12,lr}
+	stmfd sp!,{r0-r14}^	/* store userspace/system registers on stack, then return address, spsr */
+	mrs r0, spsr
+	stmfd sp!, {lr, r0}
 	# read the swi instruction
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
@@ -90,7 +95,10 @@ swi_vec:
 	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
 	bl check_context_switch  
-	ldmfd sp!,{r0-r12,pc}^
+	lmdfd sp!, {lr, r0}	/* restore, return addr, spsr and then all the user space regs and  goback to user space/system */
+	msr spsr, r0
+	ldmia sp!, {r0-r14}^
+	movs pc, lr
 
 abort_data_vec:
 	b abort_data_vec

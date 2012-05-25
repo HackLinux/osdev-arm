@@ -14,7 +14,7 @@ char *get_cpsr_info(void);
 #define UND	11011
 #define USR	10000
 
-static char str_mode[][4]      = {"", "abt", "fiq",  "irq", "svc", "sys", "und", "usr"};
+static char str_mode[][4] = {"", "abt", "fiq",  "irq", "svc", "sys", "und", "usr"};
 static char modes[4][4]         = {
                         {7, 0, 0, 0},
                         {2, 0, 0, 0},

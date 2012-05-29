@@ -4,6 +4,8 @@
 #   4. switch to task2
 #
 
+#include "hw_defs.h"
+
 .global context_switch
 /* new mode of checking 
 . check for mode
@@ -19,22 +21,23 @@ if current mode is swi, that means, user regs (r0-r12, lr) are already stores, w
 
 check_mode:
 	push {lr}
-	mrs r0, spsr_c	
+	mrs r0, spsr	
 	and r0, r0, #0x1f
 	cmp r0, #0x13  
-	be  store_svc_regs
+	beq store_svc_regs
 	pop {pc}
 store_svc_regs:
 		/* go to svc mode */
-	mrs r0, cpsr_c
+	mrs r0, cpsr
 	bic r0, #0x1f
 	orr r0, #0x13
 	msr cpsr_c, r0
 	ldr r12, =cur_pcb_ptr				/* now in svc mode overwrite pcb sp, lr with svc sp, lr*/
 	ldr r12, [r12]
-	mov r13, [r12, #0x30]
-	mov r14, [r12, #0x34]
-	mrs r0, cpsr_c
+	str r13, [r12, #0x30]
+	str r14, [r12, #0x34]
+	mov r13, #SVC_STACK	/* till earlier we are pointing to process svc stack, now reset it */
+	mrs r0, cpsr
 	bic r0, #0x1f
 	orr r0, #0x12
 	msr cpsr_c, r0	
@@ -56,10 +59,10 @@ context_switch:
 
 	/* check mode, if swi, then pcb's sp, lr points to user_stack and user_lr or sys_stack and sys_lr*/
 	/* switch to swi, get the sp, lr and overwrite pcb sp and lr respectively 
-	/* current context is saved */
-	/* now restore the next task context */
+	   current context is saved 
+	   now restore the next task context */
 
-	mov r13, #0x23000
+	mov r13, #IRQ_STACK
 	
 	bl check_mode
 
@@ -74,20 +77,31 @@ context_switch:
 	msr spsr_cxsf, r0
 
 	sub r13, r13, #60
-	mrs r0, spsr_c	
+	mov r1, r13		/* this is req bcoz, if prev is svc then r13 is not longer accessible */
+	mrs r0, spsr	
 	and r0, r0, #0x1f
-	cmp r0, #0x13  
-	be  restore_svc_regs
+	cmp r0, #0x13  		/* if prev mode is svc restore svc regs */
+	beq  restore_svc_regs
 	ldmia r13, {r0-r14}^
 	b epilogue
 
 restore_svc_regs:
-	ldmia r13, {r0-r14}
+	mrs r0, cpsr
+	bic r0, #0x1f
+	orr r0, #0x13
+	msr cpsr_c, r0
+	mov r13, r1
+	ldmia r13, {r0-r14}	/* this will restore svc r13, r14 */
+	mrs r0, cpsr
+	bic r0, #0x1f
+	orr r0, #0x12
+	msr cpsr_c, r0
+	ldmia r13, {r0-r12}	/* now in irq mode, r13 is not changed, so .. */
 
 epilogue:
-	/* update the set_current */	
-	/* restore r13 of irq stack */
-	mov r13, #0x23000
+	/* update the set_current 	
+	restore r13 of irq stack */
+	mov r13, #IRQ_STACK
 	movs pc, r14
 
 

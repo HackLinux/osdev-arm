@@ -30,24 +30,6 @@ reset_vec:
 undefined_vec:
 	b undefined_vec
 /*
-Okay. Here is the problem, 
-	. We are trying to implement syscall which may sleep and hence schedule
-      	. and another case where in syscall, interrupt comes and calls scheduler	
-
-Assumptions: No nested irqs
-user space => swi => 
-		case 1: swi stores user space regs
-			1.1 then interrupt comes, saves the swi context, context switch happens 
-			then later context switches to the process and goes on
-			1.2 swi is sleeping, call scheduler and context switch
-		case 2: swi did not store the user space regs
-			then interrupt comes, save the swi context, but do not switch the scheduler.
-
-	for case 2: 
-		simply do not context switch, if the prev mode is swi and user regs are not saved,
-		return from irq/fiq/abort will directly go to swi mode and then goes to case 1
-	for case 1:
-		each process maintains a 2-stacks, process stack and svc stack, which stores
 
   ==============================================
 ||		  user process 			||	
@@ -71,33 +53,45 @@ user space => swi =>
 ||						||
   ==============================================
 
-process stack is shared by both (user & swi) or (kernel & swi)
-context_switch code:
-===================
-while saving if previous mode is swi, 
-	. store user regs in the pcb
-	. store swi regs  in the pcb
-While restoring, if prev mode is swi,
-	. restore swi regs
-	. copy the user regs onto swi stack	
-			
 */
 
+#include "hw_defs.h"
+
+
+/* We store the user/system context here so that we are transperent to scheduler about our prev state */
+/* make sure swi sp is restored to the original when context switching */
 swi_vec:
-	stmfd sp!,{r0-r14}^	/* store userspace/system registers on stack, then return address, spsr */
+	stmfd sp,{r0-r14}^	
+	sub sp, sp, #60
 	mrs r0, spsr
-	stmfd sp!, {lr, r0}
+	stmfd sp!, {r0, lr}
+
+	# load svc stack top in r0
+	push {lr}
+	mov lr, pc
+	ldr pc,=get_svc_stack
+	pop {lr}
+	#copy contents of 68 bytes from svc stack top  to per process svc stack
+	
+loop:	ldmfd sp!, {r1} 
+	stmfd r0!, {r1}
+	cmp sp, #SVC_STACK
+	bne loop
+	mov sp, r0		
+	
+
+	
 	# read the swi instruction
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
-	bic r10, r10, #0xff000000
+	bic r0, r0, #0xff000000
 	mov lr,pc
-	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
-	bl check_context_switch  
-	lmdfd sp!, {lr, r0}	/* restore, return addr, spsr and then all the user space regs and  goback to user space/system */
+
+	ldmfd sp!, {r0,lr}	
 	msr spsr, r0
-	ldmia sp!, {r0-r14}^
+	ldmfd sp, {r0-r14}^
+	mov sp, #SVC_STACK
 	movs pc, lr
 
 abort_data_vec:

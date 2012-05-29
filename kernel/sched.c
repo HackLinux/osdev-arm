@@ -17,6 +17,7 @@ int context_switch_req;
 /* If prev mode is swi and its sp not equal to swi top then not need to disable schedule*/
 int disable_schedule()
 {
+	return 0;
 }
 
 

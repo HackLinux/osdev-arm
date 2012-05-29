@@ -65,7 +65,8 @@ int main()
 	timer_init();
 	mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 
-	create_idle_thread(idle_thread, "idle", 0x11f);
+	//create_idle_thread(idle_thread, "idle", 0x100|SYS_MODE);
+	create_idle_thread(idle_thread, "idle", 0x113);
 	scheduler_init();
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x10");
@@ -74,8 +75,8 @@ int main()
 #if 0
 	change_mode(USR_MODE);
 #endif
+//	create_thread(normal_thread, "normal_thread", 0x100|USR_MODE);
 	create_thread(normal_thread, "normal_thread", 0x110);
-//	create_thread(normal_thread, "normal_thread", 0x110);
 #if 0
 	__asm__ __volatile__("msr cpsr_c, #0x11");
 #endif

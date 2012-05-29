@@ -47,7 +47,7 @@ panic:
 
 
 
-
+#include "hw_defs.h"
 
 .equ STACK_SIZE, 0x1000
 .equ BASE_STACK, 0x20000

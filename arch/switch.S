@@ -43,21 +43,24 @@ store_svc_regs:
 	msr cpsr_c, r0	
 	pop {pc}
 	
-/* check cur mode: irq or (svc) 
-		 1. set the stack to point to the top of the stack  (stack_top - #no of process regs stored)
-		 2.  
-context_switch:
+.global save_process_context_irq, save_process_context_svc
+
+save_process_context_svc:
+	
+	
+save_process_context_irq:
+	mov sp, #IRQ_STACK - #60
 	ldmfd sp!, {r0-r12, lr}
-	ldr r13, =cur_pcb_ptr	
-	ldr r13, [r13]
-	stmia r13, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
+	ldr sp, =cur_pcb_ptr	
+	ldr sp, [sp]
+	stmia sp, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
 			      after this statement, r13 and r14 will reflect the current mode registers
 			      if we use pc as the last argument to ^, then spsr is copied to cpsr otherwise
 			      the registers of the saved spsr are temporarily masked for the duration of operation*/	
 	
-	add r13, r13, #68	
+	add sp, sp, #68	
 	mrs  r0, spsr	      /* get the spsr register of current task */
-	stmdb r13, {r0, lr}   /* copy the spsr and LR i.e the return address of task, no need of ^	*/
+	stmdb sp, {r0, lr}   /* copy the spsr and LR i.e the return address of task, no need of ^	*/
 
 	/* check mode, if swi, then pcb's sp, lr points to user_stack and user_lr or sys_stack and sys_lr*/
 	/* switch to swi, get the sp, lr and overwrite pcb sp and lr respectively 

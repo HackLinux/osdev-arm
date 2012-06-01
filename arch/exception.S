@@ -52,7 +52,6 @@ swi_vec:
 	mov lr,pc
 	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
-	bl check_context_switch  
 	ldmfd sp!,{r0-r12,pc}^
 
 abort_data_vec:
@@ -69,7 +68,7 @@ irq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =irq_handler
-	bl check_context_switch 
+	bl check_schedule_needed 
 	ldmfd sp!, {r0-r12, pc}^ 
 
 fiq_vec:
@@ -77,26 +76,16 @@ fiq_vec:
 	stmfd sp!, {r0-r12, lr}
 	mov lr, pc
 	ldr pc, =fiq_handler
-	bl check_context_switch 
+	bl check_schedule_needed
 	ldmfd sp!, {r0-r12, pc}^
 
 
-check_context_switch:
-/* check for context switch flag, if set call context, switch, which will never return 
-	 * so dont save the link register
-	 */
-	ldr r2, =context_switch
-	ldr r0, =context_switch_req
-	mov r4, #0
-	ldr r3, [r0]
-	str r4, [r0] 
-	cmp r3, #1
+check_schedule_needed:
+/* check for schedule_needed func, if set call schedule which will never return back in irq/fiq mode  */
+	push {lr}
+	ldr r2, =schedule
+	mov lr, pc
+	ldr pc, =schedule_needed
+	cmp r0, #1
 	moveq pc,r2	/* never returns back */
-	mov pc, lr
-	
-/*
-.global context_switch_req
-.data
-context_switch_req:
-	.word 0x00000000
-*/
+	pop {pc}

@@ -106,7 +106,8 @@ int timer_handler(int irq, void *data)
 	jiffies++;
 	//printk("timer called\n");
 	call_handlers();
-	schedule();
+	set_schedule_needed();	
+	
 	return 0;
 }
 

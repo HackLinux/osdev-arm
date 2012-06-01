@@ -1,5 +1,8 @@
 #include "sched.h"
 #include "task.h"
+#include "print.h"
+#include "processor.h"
+#include "support.h"
 
 /* 1. pick next task, curr and next task should not be same
  * 2. save current task context in the task struct
@@ -11,8 +14,30 @@
 
 //extern int context_switch_req;
 extern int cur_pcb_ptr, nxt_pcb_ptr;
-int context_switch_req;
+static int sched_needed;
 
+extern void context_switch();
+extern int get_cpsr();
+
+int schedule_needed()
+{
+	return (sched_needed)? 1 : 0;
+}
+
+void unset_schedule_needed()
+{	
+	sched_needed = 0;
+}
+
+void set_schedule_needed()
+{
+	sched_needed = 1;
+}
+int get_cur_mode()
+{
+	return (get_cpsr() & 0x1f);
+
+}
 void schedule()
 {
 //	printk("scheduler called \n");
@@ -27,9 +52,24 @@ void schedule()
 	if (thread_count() == 1)
 		return;
 
+	unset_schedule_needed();
 	cur_pcb_ptr = (int)get_current();
 	nxt_pcb_ptr = (int)(get_current()->next);
-	context_switch_req = 1;
+	
+	switch (get_cur_mode()) {
+
+	case IRQ_MODE:
+		save_process_context_irq();
+		break;
+
+	case SVC_MODE:
+		save_process_context_svc();
+		break;
+
+	default:
+		log_info_str("Invalid mode, got confused\n");
+		break;
+	} 
 	
 }
 

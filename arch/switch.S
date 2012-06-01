@@ -4,24 +4,29 @@
 #   4. switch to task2
 #
 
-.global context_switch
 /* new mode of checking 
 . check for mode
 . if irq
 	set the stack_top 
 */
-context_switch:
+.global save_process_context_irq, save_process_context_svc
+
+save_process_context_svc:
+	
+	
+save_process_context_irq:
+	mov sp, #IRQ_STACK - #60
 	ldmfd sp!, {r0-r12, lr}
-	ldr r13, =cur_pcb_ptr	
-	ldr r13, [r13]
-	stmia r13, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
+	ldr sp, =cur_pcb_ptr	
+	ldr sp, [sp]
+	stmia sp, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
 			      after this statement, r13 and r14 will reflect the current mode registers
 			      if we use pc and the last argument to ^, then spsr is copied to cpsr otherwise
 			      the registers of the saved spsr and temporarily masked for the duration of operation*/	
 	
-	add r13, r13, #68	
+	add sp, sp, #68	
 	mrs  r0, spsr	      /* get the spsr register of current task */
-	stmdb r13, {r0, lr}   /* copy the spsr and LR i.e the return address of task, no need of ^	*/
+	stmdb sp, {r0, lr}   /* copy the spsr and LR i.e the return address of task, no need of ^	*/
 
 	/* current context is saved */
 	/* now restore the next task context */

@@ -43,15 +43,17 @@ store_svc_regs:
 	msr cpsr_c, r0	
 	pop {pc}
 	
-
+/* check cur mode: irq or (svc) 
+		 1. set the stack to point to the top of the stack  (stack_top - #no of process regs stored)
+		 2.  
 context_switch:
 	ldmfd sp!, {r0-r12, lr}
 	ldr r13, =cur_pcb_ptr	
 	ldr r13, [r13]
 	stmia r13, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
 			      after this statement, r13 and r14 will reflect the current mode registers
-			      if we use pc and the last argument to ^, then spsr is copied to cpsr otherwise
-			      the registers of the saved spsr and temporarily masked for the duration of operation*/	
+			      if we use pc as the last argument to ^, then spsr is copied to cpsr otherwise
+			      the registers of the saved spsr are temporarily masked for the duration of operation*/	
 	
 	add r13, r13, #68	
 	mrs  r0, spsr	      /* get the spsr register of current task */

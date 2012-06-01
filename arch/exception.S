@@ -71,11 +71,13 @@ swi_vec:
 	mov lr, pc
 	ldr pc,=get_svc_stack
 	pop {lr}
+
 	#copy contents of 68 bytes from svc stack top  to per process svc stack
-	
+
+	sub r2, sp, #68
 loop:	ldmfd sp!, {r1} 
 	stmfd r0!, {r1}
-	cmp sp, #SVC_STACK
+	cmp r2, sp
 	bne loop
 	mov sp, r0		
 	

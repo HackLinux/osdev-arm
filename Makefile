@@ -1,7 +1,7 @@
 
 
 
-CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude -Wall 
+CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude #-Wall 
 #-DDEBUG 
 CROSS    ?=  arm-none-linux-gnueabi-
 

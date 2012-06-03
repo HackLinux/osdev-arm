@@ -79,6 +79,11 @@ char *get_task_name()
 
 }
 
+int get_svc_stack()
+{
+	return (get_current())->svc_stack_top;
+}
+
 pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, unsigned int mode)
 {
 	pcontext *pcb;
@@ -99,10 +104,9 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
-	pcb->sp = (long)pcb->stack_top;
+	pcb->sp = (long)pcb->usr_stack_top;
 	pcb->spsr = mode;
 	strncpy(pcb->name, name, TASK_NAME_SIZE);
-//	pcb->spsr = get_cpsr();
 	return pcb;	
 }
 int create_idle_thread(int (*thread_fn)(), const char *name, unsigned int mode)

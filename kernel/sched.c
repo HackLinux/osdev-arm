@@ -33,6 +33,15 @@ void set_schedule_needed()
 {
 	sched_needed = 1;
 }
+int get_process_cpsr()
+{
+	return (get_current()->spsr);
+}
+int get_process_mode()
+{
+	return (get_current()->spsr & 0x1f);
+
+}
 int get_cur_mode()
 {
 	return (get_cpsr() & 0x1f);
@@ -66,6 +75,9 @@ void schedule()
 		save_process_context_svc();
 		break;
 
+	case SYS_MODE:
+		save_process_context_sys();
+		break;
 	default:
 		log_info_str("Invalid mode, got confused\n");
 		break;

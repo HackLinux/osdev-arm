@@ -30,27 +30,14 @@ reset_vec:
 undefined_vec:
 	b undefined_vec
 
-/* switch stack depending on process id  before interrupt
-   disable interrupts
-   set stack depending on pid
-   store registers
-   enable interrupts  
-   .... goto syscall 
-   disable interrupts
-   restore registers
-   enable interrupts
-   
-   
-*/
 
 swi_vec:
 	stmfd sp!,{r0-r12,lr}
 	# read the swi instruction
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
-	bic r10, r10, #0xff000000
+	bic r0, r0, #0xff000000
 	mov lr,pc
-	/* load syscall table and r10 as offset call function */
 	ldr pc,=syscall
 	ldmfd sp!,{r0-r12,pc}^
 
@@ -81,7 +68,7 @@ fiq_vec:
 
 
 check_schedule_needed:
-/* check for schedule_needed func, if set call schedule which will never return back in irq/fiq mode  */
+/* check for schedule_needed func, if set call schedule which will never return, if cur mode is irq/fiq */
 	push {lr}
 	ldr r2, =schedule
 	mov lr, pc

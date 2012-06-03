@@ -8,14 +8,15 @@
 
 typedef struct context {
 	int r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, sp, lr;
-	int spsr, pc;
+	int pc, cpsr, spsr;
 	int pid;
 	struct context *next, *prev;
 	unsigned int in_use;
 	char name[TASK_NAME_SIZE];
-	unsigned char stack[USER_STACK_SIZE];
-	unsigned char stack_top[0]; 
-	unsigned char svc_stack[0];
+	unsigned char usr_stack[USER_STACK_SIZE];
+	unsigned char usr_stack_top[0]; 
+	unsigned char svc_stack[SVC_STACK_SIZE];
+	unsigned char svc_stack_top[0];
 }pcontext;
 
 

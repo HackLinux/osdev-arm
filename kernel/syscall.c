@@ -22,8 +22,10 @@ static long syscall_table[MAX_SYSCALL+1]= {0};
 void syscall(int no)
 {
 	log_info_str("In  syscall: %d before schedule", no);
+	dump_regs();
 	schedule();
-	log_info_str("In  syscall: %d after schedule", no);
+	dump_regs();
+	//log_info_str("In  syscall: %d after schedule", no);
 }
 
 void __div0(void)

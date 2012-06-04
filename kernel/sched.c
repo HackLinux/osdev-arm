@@ -69,6 +69,7 @@ void schedule()
 	if (thread_count() == 1)
 		return;
 
+	printk("***********Context switch ************\n");
 	unset_schedule_needed();
 	cur_pcb_ptr = (int)get_current();
 	nxt_pcb_ptr = (int)(get_current()->next);

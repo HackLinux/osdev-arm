@@ -32,14 +32,19 @@ undefined_vec:
 
 
 swi_vec:
-	stmfd sp!,{r0-r12,lr}
+	stmfd sp,{r0-r14}^
+	sub sp, sp, #60
+	stmfd sp!, {lr}
 	# read the swi instruction
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
 	bic r0, r0, #0xff000000
 	mov lr,pc
 	ldr pc,=syscall
-	ldmfd sp!,{r0-r12,pc}^
+	ldmfd sp!, {lr}
+	ldmfd sp, {r0-r14}^
+	add sp, sp, #60
+	movs pc, lr
 
 abort_data_vec:
 	b abort_data_vec

@@ -78,10 +78,13 @@ char *get_task_name()
 	return get_current()->name;
 
 }
-
+int get_usr_stack()
+{
+	return (long)((get_current())->usr_stack_top);
+}
 int get_svc_stack()
 {
-	return (get_current())->svc_stack_top;
+	return (long)((get_current())->svc_stack_top);
 }
 
 pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, unsigned int mode)

@@ -31,7 +31,12 @@ save_process_context_in_irq:
 	b restore_process_regs
 
 save_process_context_sys:
-	mov pc, lr
+	mov r0, lr
+	msr cpsr_c, #IRQ_MD
+	ldr sp, =IRQ_STACK
+	mov lr, r0
+	stmfd sp!, {r0-r12, lr}
+	b save_process_context_in_irq
 
 save_process_context_svc:
 	mov r0, sp
@@ -42,7 +47,7 @@ save_process_context_svc:
 	mov r0, lr
 	mrs r1, cpsr
 	mrs r2, spsr
-	stmia sp!, {r0-r3}
+	stmia sp!, {r0-r2}
 		
 	ldr sp, =SVC_STACK
 	b restore_process_regs	
@@ -72,9 +77,8 @@ restore_process_svc_regs:
 	msr spsr, r5
 	ldr r13, =nxt_pcb_ptr
 	ldr sp, [r13]
-	ldmia sp!, {r0-r12}
-	ldmia sp!, {r0,r14}
-	mov sp, r0
+	ldmia sp, {r0-r14}
+/*	mov sp, r0*/
 	mov pc, lr		/* we are already in svc mode, do not use movs, it will change mode */
 
 
@@ -119,14 +123,5 @@ restore_process_sys_regs:
 
 
 		
-
-
-.global cur_pcb_ptr, nxt_pcb_ptr
-
-.data
-cur_pcb_ptr:
-	.word 0x00000000
-nxt_pcb_ptr:
-	.word 0x00000000
 outage_string:
 	.string "You moron, screwed up everything"

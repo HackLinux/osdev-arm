@@ -13,7 +13,10 @@
  */
 
 //extern int context_switch_req;
+#if 0
 extern int cur_pcb_ptr, nxt_pcb_ptr;
+#endif
+pcontext *cur_pcb_ptr, *nxt_pcb_ptr;
 static int sched_needed;
 
 extern void context_switch();
@@ -71,8 +74,8 @@ void schedule()
 
 	printk("***********Context switch ************\n");
 	unset_schedule_needed();
-	cur_pcb_ptr = (int)get_current();
-	nxt_pcb_ptr = (int)(get_current()->next);
+	cur_pcb_ptr = get_current();
+	nxt_pcb_ptr = (get_current()->next);
 	
 	switch (get_cur_mode()) {
 

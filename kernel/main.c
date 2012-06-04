@@ -21,6 +21,7 @@ void mem_init();
 void scheduler_init();
 int idle_thread();
 int normal_thread();
+int normal_thread1();
 
 #define QEMU_CMDLINE_ADDR 0x12c
 
@@ -50,6 +51,8 @@ int main()
 	
 
 	create_thread(normal_thread, "normal_thread", 0x110);
+	create_thread(normal_thread, "normal_thread1", 0x110);
+	create_thread(normal_thread1, "screw_up", 0x11f);
 	
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");

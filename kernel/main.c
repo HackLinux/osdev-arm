@@ -54,7 +54,7 @@ int main()
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");
 	
-	log_info_str("In main space %d", 3);
+	log_info_str("In main space %40d", 1<<31);
 	
 	idle_thread();
 

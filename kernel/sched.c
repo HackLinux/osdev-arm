@@ -35,12 +35,20 @@ void set_schedule_needed()
 }
 int get_process_cpsr()
 {
+	return (get_current()->cpsr);
+}
+int get_process_spsr()
+{
 	return (get_current()->spsr);
 }
-int get_process_mode()
+
+int get_process_mode_cpsr()
+{
+	return (get_current()->cpsr & 0x1f);
+}
+int get_process_mode_spsr()
 {
 	return (get_current()->spsr & 0x1f);
-
 }
 int get_cur_mode()
 {
@@ -68,7 +76,7 @@ void schedule()
 	switch (get_cur_mode()) {
 
 	case IRQ_MODE:
-		save_process_context_irq();
+		save_process_context_in_irq();
 		break;
 
 	case SVC_MODE:

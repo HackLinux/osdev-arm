@@ -32,9 +32,6 @@ setup_stacks:
 	mov pc, lr
 
 
-dump:
-	ldr r0, =panic
-	bl asm_log_info
 
 change_to_mode:
 	mov r2, lr
@@ -43,5 +40,3 @@ change_to_mode:
 	msr cpsr_c, r1
 	mov pc, r2
 	
-panic:
-	.string "panic"

@@ -7,10 +7,10 @@
 
 static pcontext *pid_array[MAX_THREADS];
 
-static pcontext *cur_pcb = 0;
-static pcontext *head = 0;
-static pcontext *tail = 0;
-static int num_threads = 0;
+static pcontext *cur_pcb 	= 0;
+static pcontext *head 		= 0;
+static pcontext *tail 		= 0;
+static int num_threads 		= 0;
 
 inline int thread_count()
 {
@@ -105,7 +105,7 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)exit_thread;
 	pcb->sp = (long)pcb->usr_stack_top;
-	pcb->spsr = mode;
+	pcb->cpsr = mode;
 	strncpy(pcb->name, name, TASK_NAME_SIZE);
 	return pcb;	
 }

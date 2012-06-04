@@ -27,25 +27,24 @@ static int ptr = -1;
 
 void console_write(char *);
 /* valid base: 2, 8, 10 */
-static int parse_num(unsigned int value, unsigned int base, int width) 
+static int parse_num(unsigned int value, unsigned int base) 
 {
-	if (!width) width=10;
+	int width = 0;
 	unsigned int n = value / base;
 	int r = value % base;
 	if (r < 0) {
 		r += base;
 		--n;
 	}
-	if ((value >= base) && (--width >= 0))
-		width = parse_num(n, base, width);
+	if (value >= base) 
+		width = parse_num(n, base) + 1;
 	buf[ptr++] = "0123456789"[r];
 	return width;
 }
 
-static int parse_hex(unsigned int value, int width) 
+static int parse_hex(unsigned int value) 
 {
-	if (!width) width= 8;
-	int i = width-2;
+	int i = 8;
 	buf[ptr++] = '0';
 	buf[ptr++] = 'x';
 	
@@ -154,6 +153,7 @@ char * printk(const char *fmt, ...)
 		}
 		i++;
 		int field_width = 0;
+		int width;
 		int fw = 0;
 		while (is_digit(fmt[i]))
 			fw = 10 * fw + fmt[i++] - '0';
@@ -181,12 +181,12 @@ char * printk(const char *fmt, ...)
 			buf[ptr++] = (char)args_next(args, int);
 			break;
 		case 'x':
-			field_width = parse_hex((unsigned long)args_next(args, unsigned long), field_width);
+			field_width -= parse_hex((unsigned long)args_next(args, unsigned long));
 			while(field_width-- > 0)
 				buf[ptr++] = ' ';
 			break;
 		case 'd':
-			field_width=parse_num((unsigned int)args_next(args, unsigned int), 10, field_width);
+			field_width -=  parse_num((unsigned int)args_next(args, unsigned int), 10);
 			while(field_width-- > 0)
 				buf[ptr++] = ' ';
 			break;

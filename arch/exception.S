@@ -50,6 +50,8 @@ abort_data_vec:
 	b abort_data_vec
 
 abort_prefetch_vec:
+	mov lr, pc
+	ldr pc,=asm_log_info
 	b abort_prefetch_vec
 
 reserved_vec:
@@ -76,8 +78,10 @@ check_schedule_needed:
 /* check for schedule_needed func, if set call schedule which will never return, if cur mode is irq/fiq */
 	push {lr}
 	ldr r2, =schedule
+	push {r2}
 	mov lr, pc
 	ldr pc, =schedule_needed
+	pop {r2}
 	cmp r0, #1
 	moveq pc,r2	/* never returns back */
 	pop {pc}

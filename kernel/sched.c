@@ -69,11 +69,11 @@ void schedule()
  	*  	context switch
 	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
+	unset_schedule_needed();
 	if (thread_count() == 1)
 		return;
 
 	printk("***********Context switch ************\n");
-	unset_schedule_needed();
 	cur_pcb_ptr = get_current();
 	nxt_pcb_ptr = (get_current()->next);
 	

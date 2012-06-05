@@ -48,11 +48,11 @@ int main()
 
 	create_idle_thread(idle_thread, "idle", 0x11f);
 	scheduler_init();
+	mmu_init();	
 	
-
-	create_thread(normal_thread, "normal_thread", 0x110);
-	create_thread(normal_thread, "normal_thread1", 0x110);
-	create_thread(normal_thread1, "screw_up", 0x11f);
+//	create_thread(normal_thread, "normal_thread", 0x110);
+//	create_thread(normal_thread, "normal_thread1", 0x110);
+//	create_thread(normal_thread1, "screw_up", 0x11f);
 	
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");

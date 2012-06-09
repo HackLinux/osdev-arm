@@ -6,26 +6,26 @@
 
 #include "hw_defs.h"
 
-.global save_process_context_in_irq, save_process_context_svc, save_process_context_sys, restore_cur_regs_n_schedule
+.global save_process_context_in_irq, save_process_context_svc, save_process_context_sys, switch_to_next_task
 
 
 save_process_context_in_irq:
-	ldr sp, =(IRQ_STACK - 56)
+	ldr    sp, =(IRQ_STACK - 56)
 	ldmfd sp!, {r0-r12, lr}
-	ldr r13, =cur_pcb_ptr	
-	ldr sp, [r13]
-	stmia sp, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
+	ldr   r13, =cur_pcb_ptr	
+	ldr    sp, [r13]
+	stmia  sp, {r0-r14}^  /* this will use the user registers, ie, r0-r12 common registers and r13_user n r14_user
 			      after this statement, r13 and r14 will reflect the current mode registers
 			      if we use pc and the last argument to ^, then spsr is copied to cpsr otherwise
 			      the registers of the saved spsr and temporarily masked for the duration of operation*/	
 	
-	add sp, sp, #68	
-	mov  r0, lr
-	mrs  r1, spsr	      
+	add   sp, sp, #68	
+	mov   r0, lr
+	mrs   r1, spsr	      
 	stmdb sp, {r0, r1}   /* copy the lr and spsr on pcb no need of  ^*/
 
-	/* current task context is saved 
-	 * restore the next task context 
+	/* . current task context is saved 
+	 * . restore the next task context 
  	 */
 	ldr sp, =IRQ_STACK
 	b restore_process_regs
@@ -122,7 +122,7 @@ restore_process_sys_regs:
 	movs pc, lr
 
 /* this function is called when a process is exited to restore prev task regs */
-restore_cur_regs_n_schedule:
+switch_to_next_task:
 	ldr sp, =SVC_STACK
 	b restore_process_regs	
 

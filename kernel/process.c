@@ -11,9 +11,9 @@ int idle_thread()
 	int i=100;
 	int stop;
 	while (1) {
-		sleep(10);
 		get_stack_top();
 		log_info_str("Running %s: %d, stop = %x", get_task_name(), i++, stop);
+		schedule();
 	}
 	return 0;
 }
@@ -25,7 +25,7 @@ int normal_thread()
 	while (1) {
 		get_stack_top();
 		log_info_str("Running %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, stop);
-		sleep(10);
+		sleep(10000);
 	}
 	return 0;
 }
@@ -38,6 +38,7 @@ int normal_thread1()
 //	while (1) {
 		log_info_str("before schedule %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, stop);
 		schedule();
+		sleep(1000);
 		log_info_str("after schedule %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, stop);
 //	}
 	exit(0);

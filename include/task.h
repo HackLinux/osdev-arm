@@ -6,11 +6,21 @@
 #define MAX_THREADS 16
 #define TASK_NAME_SIZE 16
 
+typedef enum TASK_STATE {
+	READY 	 = 1,
+	RUNNING  = 2,
+	SLEEPING = 3,
+	DYING	 = 4,
+	DEAD	 = 5
+}TASK_STATE;
+	
+
 typedef struct context {
 	int r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, sp, lr;
 	int pc, cpsr, spsr;
 	int pid;
 	struct context *next, *prev;
+	TASK_STATE state;
 	unsigned int in_use;
 	char name[TASK_NAME_SIZE];
 	unsigned char usr_stack[USER_STACK_SIZE];
@@ -29,5 +39,11 @@ char *get_task_name();
 int thread_count(void);
 void set_current(pcontext *);
 pcontext *get_pcb_with_pid(int pid);
+
+static inline void set_task_state(pcontext *pcb, TASK_STATE state)
+{
+	pcb->state = state;
+}
+
 #endif
 #endif

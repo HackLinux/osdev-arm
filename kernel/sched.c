@@ -1,26 +1,91 @@
-#include "sched.h"
-#include "task.h"
-#include "print.h"
-#include "processor.h"
-#include "support.h"
+#include <sched.h>
+#include <task.h>
+#include <print.h>
+#include <processor.h>
+#include <support.h>
 
-/* 1. pick next task, curr and next task should not be same
- * 2. save current task context in the task struct
- *    2.1 save r0-r3 registers, r13, r14, spsr
- * 3. pick next task context from task struct
- *    3.1 restrore r0-r3, r13, r14, spsr 
- * 4. 
- */
 
-//extern int context_switch_req;
-#if 0
-extern int cur_pcb_ptr, nxt_pcb_ptr;
-#endif
 pcontext *cur_pcb_ptr, *nxt_pcb_ptr;
 static int sched_needed;
 
 extern void context_switch();
 extern int get_cpsr();
+
+
+static pcontext *cur_pcb 	= 0;
+static pcontext *head 		= 0;
+static pcontext *tail 		= 0;
+static int num_threads 		= 0;
+
+int thread_count()
+{
+	return num_threads;
+}
+
+void inc_thread_count()
+{
+	num_threads++;
+}
+
+void dec_thread_count()
+{
+	num_threads++;
+}
+
+void set_task_list_head(pcontext *pcb)
+{
+	head = pcb;
+}
+
+void set_task_list_tail(pcontext *pcb)
+{
+	tail = pcb;
+}
+
+pcontext *get_task_list_tail()
+{
+	return tail;
+}
+
+pcontext *get_task_list_head()
+{
+	return head;
+}
+
+
+
+void set_current(pcontext *pcb)
+{
+	cur_pcb = pcb;
+}
+
+pcontext *get_current()
+{
+	return cur_pcb;
+}
+
+int get_pid()
+{
+	return get_current()->pid;
+}
+
+char *get_task_name()
+{
+	return get_current()->name;
+
+}
+
+int get_usr_stack()
+{
+	return (long)((get_current())->usr_stack_top);
+}
+
+int get_svc_stack()
+{
+	return (long)((get_current())->svc_stack_top);
+}
+
+
 
 int schedule_needed()
 {
@@ -36,10 +101,12 @@ void set_schedule_needed()
 {
 	sched_needed = 1;
 }
+
 int get_process_cpsr()
 {
 	return (get_current()->cpsr);
 }
+
 int get_process_spsr()
 {
 	return (get_current()->spsr);
@@ -49,10 +116,12 @@ int get_process_mode_cpsr()
 {
 	return (get_current()->cpsr & 0x1f);
 }
+
 int get_process_mode_spsr()
 {
 	return (get_current()->spsr & 0x1f);
 }
+
 int get_cur_mode()
 {
 	return (get_cpsr() & 0x1f);
@@ -65,6 +134,49 @@ void update_rq_ptrs()
 	nxt_pcb_ptr = (get_current()->next);
 
 }
+
+
+int insert_task(pcontext *pcb)
+{
+	pcontext *t = get_task_list_tail();
+	pcontext *h = get_task_list_head();
+	pcb->next = t->next;
+	pcb->prev = t;
+	t->next = pcb;
+	h->prev = pcb;
+	set_task_list_tail(pcb);
+	inc_thread_count();
+}
+
+
+int remove_task(pcontext *pcb, int free_pcb)
+{
+	pcontext *p, *n;
+	p = pcb->prev;
+	n = pcb->next;
+	p->next = n;
+	n->prev = p;
+	pcb->next = pcb->prev = 0;
+	if (get_task_list_tail() == pcb) 
+		set_task_list_tail(p);
+
+	dec_thread_count();
+	set_current(p);
+	update_rq_ptrs();
+	if (free_pcb)
+		kfree(pcb);
+
+	switch_to_next_task();
+
+}
+
+void init_runq(pcontext *pcb)
+{
+	head = tail = pcb;
+	head->next = head->prev = pcb; 
+	inc_thread_count();
+}
+
 void schedule()
 {
 //	printk("scheduler called \n");

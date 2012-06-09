@@ -1,50 +1,11 @@
-#include "print.h"
-#include "sched.h"
-#include "task.h"
-#include "malloc.h"
-#include "funcs.h"
-#include "support.h"
+#include <print.h>
+#include <sched.h>
+#include <task.h>
+#include <malloc.h>
+#include <funcs.h>
+#include <support.h>
 
 static pcontext *pid_array[MAX_THREADS];
-
-static pcontext *cur_pcb 	= 0;
-static pcontext *head 		= 0;
-static pcontext *tail 		= 0;
-static int num_threads 		= 0;
-
-inline int thread_count()
-{
-	return num_threads;
-}
-void set_task_list_head(pcontext *pcb)
-{
-	head = pcb;
-}
-
-void set_task_list_tail(pcontext *pcb)
-{
-	tail = pcb;
-}
-
-pcontext *get_task_list_tail()
-{
-	return tail;
-}
-
-pcontext *get_task_list_head()
-{
-	return head;
-}
-
-void set_current(pcontext *pcb)
-{
-	cur_pcb = pcb;
-}
-
-pcontext *get_current()
-{
-	return cur_pcb;
-}
 
 int get_free_pid()
 {
@@ -68,24 +29,6 @@ pcontext *get_pcb_with_pid(int id)
 	return 0;
 }
 
-int get_pid()
-{
-	return get_current()->pid;
-
-}
-char *get_task_name()
-{
-	return get_current()->name;
-
-}
-int get_usr_stack()
-{
-	return (long)((get_current())->usr_stack_top);
-}
-int get_svc_stack()
-{
-	return (long)((get_current())->svc_stack_top);
-}
 void abyss()
 {
 	while (1) {
@@ -100,18 +43,11 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 {
 	pcontext *pcb;
 	unsigned int pcb_sz;
-	/* copy all registers, 
- 	 * and set the pc and lr to thread_fn
- 	 * flags to a storage location */
-	if (num_threads > MAX_THREADS)
-		return 0;
-	pcb_sz = sizeof(pcontext);
-
-	//Allocate extra supervisor stack for user tasks
-	if (get_mode(mode) == USR) 
-		pcb_sz += SVC_STACK_SIZE;		
 	
-	pcb = kmalloc(pcb_sz);
+	if (thread_count() > MAX_THREADS)
+		return 0;
+
+	pcb = kmalloc(sizeof(*pcb));
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
@@ -124,30 +60,23 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 int create_idle_thread(int (*thread_fn)(), const char *name, unsigned int mode)
 {
 	pcontext *pcb =	common_thread_create(0, thread_fn, name, mode);
+	init_runq(pcb);
 	mark_pid(0, pcb);
-	head = tail = pcb;
-	head->next = head->prev = head;
-	num_threads++;
 	return 1;
 }
 
 int create_thread(int (*thread_fn)(), const char *name, unsigned mode)
 {
 	int pid = get_free_pid();
+	
 	if (pid == -1)
 		return 0;	
+	
 	printk("in create thread %s\n",name);
 	/* disable interrupts */
 	pcontext *pcb =	common_thread_create(pid, thread_fn, name, mode);
-	pcontext *t = get_task_list_tail();
-	pcontext *h = get_task_list_head();
-	pcb->next = t->next;
-	pcb->prev = t;
-	t->next = pcb;
-	h->prev = pcb;
-	
-	set_task_list_tail(pcb);
-	num_threads++;
+	insert_task(pcb);
+
 	/* enable interrupts */
 	mark_pid(pid, pcb);
 	return 1;
@@ -155,27 +84,10 @@ int create_thread(int (*thread_fn)(), const char *name, unsigned mode)
 
 void sys_exit(int status)
 {
-	/* cleanup thread, and schedule other threads, init shud never exit */
-	/* load context and check pid */
 	pcontext *pcb = get_current();
 	if (pcb->pid == 0) {
 		panic("Killing init thread \n");
 	}
 	mark_pid(pcb->pid, 0);
-	num_threads--;
-	pcontext *p, *n;
-	p = pcb->prev;
-	n = pcb->next;
-	p->next = n;
-	n->prev = p;
-	pcb->next = pcb->prev = 0;
-	if (get_task_list_tail() == pcb) 
-		set_task_list_tail(p);
-
-	set_current(p);
-	printk("%s exiting\n", pcb->name);
-	update_rq_ptrs();
-	kfree(pcb);
-	restore_cur_regs_n_schedule();
-//	schedule();
+	remove_task(pcb, 1);
 }

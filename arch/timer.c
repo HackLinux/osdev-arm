@@ -1,6 +1,8 @@
-#include "print.h"
-#include "interrupt.h"
-#include "sched.h"
+#include <print.h>
+#include <interrupt.h>
+#include <sched.h>
+#include <timer.h>
+#include <malloc.h>
 /* SP 804 */
 
 /*registers*/
@@ -11,9 +13,9 @@
 #define  TIMER_BASE_2   0X101E3000 
 #define  TIMER_BASE_3   TIMER_BASE_2  + 0X20
 
-#define TIMER_LOAD 		0x00
+#define TIMER_LOAD 			0x00
 #define TIMER_VALUE    		0x01
-#define TIMER_CNTL		0X02
+#define TIMER_CNTL			0X02
 #define TIMER_INTCLR		0x03
 #define TIMER_INTR_STATUS	0X04
 #define TIMER_MASK_INTR_STATUS  0X05
@@ -65,49 +67,96 @@ void print_timer_values(int count)
  *|____|  |___|   |___|	   |___| 
  */
 
+static timer_list *h_tm = 0;
 static volatile unsigned int rem_jiffies[20] = {0};
 int timers_cnt = 0;
+
 #define HZ 1
 #define JIFFY 1000/HZ
-/* 1 jiffy = 10 msecs*/
-void do_sleep(int msecs, int mine)
+
+
+
+/* jiffies -> number of clock ticks 
+ * JIFFY   -> number of clock tics in a second
+ * HZ is number of timer scheduler called a sec
+ * Current scenerio HZ = 1, JIFFIES = 1
+ */
+static long msecs_to_jiffies(long msecs)
 {
-#if 0
-//	unsigned int mine = -1;
-	int i;
-	/*
-	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) {
-		if (!rem_jiffies[i]) {
-			mine = i;
-			rem_jiffies[i] = msecs / (JIFFY);
-			break;
-		}
-	}*/
-#endif
-	rem_jiffies[mine] = msecs / (JIFFY);
-//	if (mine != -1)
-	while (rem_jiffies[mine]);
+	return (msecs + 999)/1000;
 }
+
+
+int insert_timer(timer_list *tm)
+{	
+	long msec_j = tm->jiffies;
+
+	timer_list *t, *pt;
+
+	if (h_tm == 0) {
+		h_tm = tm;
+		return 0;
+	}
+	
+	for (pt = h_tm, t = h_tm; t != 0; msec_j -= t->jiffies, pt = t, t = t->next) {
+			if (msec_j < t->jiffies) {
+				if (t == h_tm) {
+					tm->next = h_tm;
+					h_tm = tm;	
+				}
+				else {
+					pt->next = tm;
+					tm->next = t;	
+				}
+				tm->jiffies = msec_j;
+				for (t = tm->next; t != 0; t = t->next)
+					t->jiffies -= tm->jiffies;
+				return 0;
+			}
+	}
+	pt->next = tm;
+	return 0;	
+}
+
+int add_timer(long msecs, void (*call_back)(void *data), void *data)
+{
+	timer_list *tm = kmalloc(sizeof(timer_list));
+
+	tm->jiffies = msecs_to_jiffies(msecs);
+	tm->func = call_back;
+	tm->data = data;
+	tm->next = 0;
+	insert_timer(tm);
+}
+
+int update_timer_list()
+{
+	if (h_tm == 0)
+		return 0;
+
+	h_tm->jiffies--;
+	while (h_tm && h_tm->jiffies == 0) {
+		h_tm->func(h_tm->data);	
+		kfree(h_tm);
+		h_tm = h_tm->next;
+	}
+}
+
+
 
 void call_handlers()
 {
 	int i;
-//	printk("0 -> %d \t 1 -> %d \n", rem_jiffies[0], rem_jiffies[1]);
-	for (i = 0; i < sizeof(rem_jiffies)/sizeof(rem_jiffies[0]); i++) 
-		if (rem_jiffies[i]) { 
-			rem_jiffies[i]--;
-		}
-
+	update_timer_list();
 }
+
 int timer_handler(int irq, void *data)
 {
 	volatile unsigned int *tbase = (volatile unsigned int *)get_timer_base(0);
 	tbase[TIMER_INTCLR] = 1;
 	jiffies++;
-	//printk("timer called\n");
 	call_handlers();
 	set_schedule_needed();	
-	
 	return 0;
 }
 

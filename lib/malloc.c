@@ -1,10 +1,10 @@
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <malloc.h>
-#include <stdlib.h>
-#include <fcntl.h>
+//#include <stdio.h>
+//#include <string.h>
+//#include <assert.h>
+//#include <malloc.h>
+//#include <stdlib.h>
+//#include <fcntl.h>
 
 #define  	MIN_MEM_ALLOC 128
 #define 	MIN_BLOCK_SIZE sizeof(long)

@@ -58,6 +58,13 @@ int get_cur_mode()
 	return (get_cpsr() & 0x1f);
 
 }
+
+void update_rq_ptrs()
+{
+	cur_pcb_ptr = get_current();
+	nxt_pcb_ptr = (get_current()->next);
+
+}
 void schedule()
 {
 //	printk("scheduler called \n");
@@ -74,8 +81,7 @@ void schedule()
 		return;
 
 	printk("***********Context switch ************\n");
-	cur_pcb_ptr = get_current();
-	nxt_pcb_ptr = (get_current()->next);
+	update_rq_ptrs();
 	
 	switch (get_cur_mode()) {
 

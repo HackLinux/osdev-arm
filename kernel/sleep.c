@@ -1,7 +1,7 @@
-#include "syscall.h"
+#include "syscall_defs.h"
 
-int sys_msleep(int msecs)
+int sys_sleep(long msecs)
 {
-
+	schedule();
 	return 1;
 }

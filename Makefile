@@ -1,7 +1,7 @@
 
 
 
-CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude #-Wall 
+CFLAGS    = -mcpu=arm926ej-s -nostartfiles -fno-common -g   -Iinclude -Ilib -nostdinc #-Wall  
 #-DDEBUG 
 CROSS    ?=  arm-none-linux-gnueabi-
 
@@ -11,7 +11,7 @@ objdir ?= .obj
 
 vpath %.c arch kernel lib
 vpath %.S arch kernel lib
-vpath %.h include
+vpath %.h include lib
 
 csources    = $(wildcard arch/*.c kernel/*.c lib/*.c)
 asmsources  = $(wildcard arch/*.S lib/*.S)

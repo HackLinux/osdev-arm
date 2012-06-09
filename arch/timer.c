@@ -70,7 +70,7 @@ int timers_cnt = 0;
 #define HZ 1
 #define JIFFY 1000/HZ
 /* 1 jiffy = 10 msecs*/
-void sleep(int msecs, int mine)
+void do_sleep(int msecs, int mine)
 {
 #if 0
 //	unsigned int mine = -1;

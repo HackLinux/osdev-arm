@@ -6,7 +6,7 @@
 
 #include "hw_defs.h"
 
-.global save_process_context_in_irq, save_process_context_svc, save_process_context_sys
+.global save_process_context_in_irq, save_process_context_svc, save_process_context_sys, restore_cur_regs_n_schedule
 
 
 save_process_context_in_irq:
@@ -120,6 +120,12 @@ restore_process_sys_regs:
 	ldmia sp, {r0-r14}^
 	ldr sp, =IRQ_STACK
 	movs pc, lr
+
+/* this function is called when a process is exited to restore prev task regs */
+restore_cur_regs_n_schedule:
+	ldr sp, =SVC_STACK
+	b restore_process_regs	
+
 
 
 		

@@ -8,11 +8,11 @@ undefined:
 swi:	
 	b swi_vec
 
-abort_d:	
-	b abort_data_vec
-
 abort_p:	
 	b abort_prefetch_vec
+
+abort_d:	
+	b abort_data_vec
 
 reserved:	
 	b reserved_vec
@@ -39,8 +39,14 @@ swi_vec:
 	ldr r0, [lr, #-4]
 	# mask of the top 8 bits
 	bic r0, r0, #0xff000000
-	mov lr,pc
-	ldr pc,=syscall
+# lets use r12 to get the base addr of syscall table
+	push {r0}
+	mov lr,pc 
+	ldr pc,=get_syscall_base
+	mov r12, r0
+	pop {r0}
+	mov lr, pc
+	ldr pc, [r12, r0, lsl #2]
 	ldmfd sp!, {lr}
 	ldmfd sp, {r0-r14}^
 	add sp, sp, #60

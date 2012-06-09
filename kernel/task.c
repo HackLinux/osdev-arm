@@ -86,6 +86,15 @@ int get_svc_stack()
 {
 	return (long)((get_current())->svc_stack_top);
 }
+void abyss()
+{
+	while (1) {
+		printk("In abyss moron = %s \n", get_current()->name);
+		schedule();
+	}	
+	
+
+}
 
 pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, unsigned int mode)
 {
@@ -106,7 +115,7 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 	memset(pcb, 0, sizeof(*pcb));
 	pcb->pid = pid;	
 	pcb->pc = (long)thread_fn;
-	pcb->lr = (long)exit_thread;
+	pcb->lr = (long)abyss;
 	pcb->sp = (long)pcb->usr_stack_top;
 	pcb->cpsr = mode;
 	strncpy(pcb->name, name, TASK_NAME_SIZE);
@@ -144,7 +153,7 @@ int create_thread(int (*thread_fn)(), const char *name, unsigned mode)
 	return 1;
 }
 
-void exit_thread()
+void sys_exit(int status)
 {
 	/* cleanup thread, and schedule other threads, init shud never exit */
 	/* load context and check pid */
@@ -159,8 +168,14 @@ void exit_thread()
 	n = pcb->next;
 	p->next = n;
 	n->prev = p;
+	pcb->next = pcb->prev = 0;
 	if (get_task_list_tail() == pcb) 
 		set_task_list_tail(p);
+
+	set_current(p);
+	printk("%s exiting\n", pcb->name);
+	update_rq_ptrs();
 	kfree(pcb);
-	schedule();
+	restore_cur_regs_n_schedule();
+//	schedule();
 }

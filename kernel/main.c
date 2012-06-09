@@ -4,7 +4,6 @@
 #include "processor.h"
 #include "print.h"
 #include "support.h"
-#include "syscall.h"
 
 int print(char *s);
 void setup_idt();
@@ -50,9 +49,9 @@ int main()
 	scheduler_init();
 	mmu_init();	
 	
-//	create_thread(normal_thread, "normal_thread", 0x110);
-//	create_thread(normal_thread, "normal_thread1", 0x110);
-//	create_thread(normal_thread1, "screw_up", 0x11f);
+	create_thread(normal_thread, "normal_thread", 0x110);
+	create_thread(normal_thread, "normal_thread1", 0x110);
+	create_thread(normal_thread1, "screw_up", 0x11f);
 	
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");
@@ -80,6 +79,5 @@ int main()
 void msg()
 {
 	printk("calling msg\n");
-
 }
 

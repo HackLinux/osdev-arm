@@ -17,6 +17,15 @@
 #define UND_MD	  0x1b
 #define USR_MD	  0x10
 
+#define USR_MD_IRQS_OFF 0Xd0
+#define SVC_MD_IRQS_OFF 0xd3
+#define IRQ_MD_IRQS_OFF 0xd2
+#define	FIQ_MD_IRQS_OFF 0xd1
+#define	SYS_MD_IRQS_OFF 0xdf
+#define	ABT_MD_IRQS_OFF 0xd7
+#define UND_MD_IRQS_OFF 0xdb
+ 
+
 #define IRQ_MDMASK   0xd2
 #define FIRQ_MDMASK  0xd1
 

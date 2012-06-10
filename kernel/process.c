@@ -12,9 +12,9 @@ int idle_thread()
 	printk("In idle thread: %d\n", get_pid());
 	int i=100;
 	while (1) {
-		log_info_str("Running %s: %d, stop = %x", get_task_name(), i++, get_stack_top());
+//		log_info_str("Running %s: %d, stop = %x", get_task_name(), i++, get_stack_top());
         schedule();
- //   	sleep(1);
+  //  	sleep(1);
 	}
 	return 0;
 }
@@ -24,7 +24,7 @@ int normal_thread()
 	int i = 20;
 	int stop;
 	while (1) {
-		log_info_str("Running %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, get_stack_top());
+	//	log_info_str("Running %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, get_stack_top());
 	    sleep(10000);
 	}
 	return 0;

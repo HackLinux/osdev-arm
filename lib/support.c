@@ -49,3 +49,9 @@ void panic(char *str)
 	printk("Panic ---> %s : %s\n", get_current()->name, str);
 	halt();
 }
+void hard_loop()
+{
+
+    int i = 0;
+    for (i = 0; i < 1<<22; i++);
+}

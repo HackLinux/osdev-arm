@@ -179,6 +179,7 @@ void init_runq(pcontext *pcb)
 
 void schedule()
 {
+    static int csw = 0;
 //	printk("scheduler called \n");
 	/* 1. num of ready tasks == 1 , i.e idle thread running, so dont bother, return back
  	*  2. num of ready taks > 1, round robin, pick next task
@@ -187,12 +188,14 @@ void schedule()
  	*  	3.2 restore new task state from that task's kernel stack
  	*  	context switch
  	*/
- 	//disable_interrupts();
+ 	disable_interrupts();
+
 	unset_schedule_needed();
+
 	if (thread_count() == 1)
 		return;
 
-    log_info_str("***********Context switch ************ %s\n", get_current()->name);
+    log_info_str("***********Context switch ************ %s, %d\n", get_current()->name, csw++);
 	update_rq_ptrs();
 	
 	switch (get_cur_mode()) {
@@ -207,8 +210,9 @@ void schedule()
 
 	case SYS_MODE:
 		save_process_context_sys();
-	  //  enable_interrupts();
+	    enable_interrupts();
 		break;
+
 	default:
 		log_info_str("Invalid mode, got confused\n");
 		panic();

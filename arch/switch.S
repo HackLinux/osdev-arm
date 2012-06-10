@@ -33,7 +33,7 @@ save_process_context_in_irq:
 save_process_context_sys:
 	mov r0, lr
     mrs r1, cpsr  
-	msr cpsr_c, #IRQ_MD
+	msr cpsr_c, #IRQ_MD_IRQS_OFF
 	ldr sp, =IRQ_STACK
 	mov lr, r0
 	msr spsr, r1     
@@ -100,14 +100,14 @@ flow:
 
 restore_process_usr_regs:	
 restore_process_sys_regs:
-	msr cpsr_c, #IRQ_MD	
+	msr cpsr_c, #IRQ_MD_IRQS_OFF
 	
 	/* set the svc stack */	
 	mov lr, pc
 	ldr pc, =get_svc_stack
-	msr cpsr_c, #SVC_MD
+	msr cpsr_c, #SVC_MD_IRQS_OFF
 	mov sp, r0
-	msr cpsr_c, #IRQ_MD
+	msr cpsr_c, #IRQ_MD_IRQS_OFF
 	/* end of svc stack */
 
 	ldr sp, =nxt_pcb_ptr

@@ -4,11 +4,13 @@
 			printk("%15s:%15s:%d:%s: "str"\n", __FILE__, __func__, __LINE__,get_cpsr_info(),##__VA_ARGS__);
 //			printk(str, ##__VA_ARGS__);
 #define log_info() printk("%s:%s:%d: %s\n", __FILE__, __func__, __LINE__, get_cpsr_info())
-#define get_stack_top() \
-	{\
-	int stop; \
-	__asm__ __volatile("mov %0, sp" :"=r"(stop)::); \
-	}
+static inline long get_stack_top()
+{
+	int stop; 
+	__asm__ __volatile("mov %0, sp" :"=r"(stop)::); 
+	return stop;
+}
+	
 
 char *get_cpsr_info(void);
 #define ABRT 	10111

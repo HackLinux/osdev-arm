@@ -32,9 +32,11 @@ save_process_context_in_irq:
 
 save_process_context_sys:
 	mov r0, lr
+    mrs r1, cpsr  
 	msr cpsr_c, #IRQ_MD
 	ldr sp, =IRQ_STACK
 	mov lr, r0
+	msr spsr, r1     
 	stmfd sp!, {r0-r12, lr}
 	b save_process_context_in_irq
 

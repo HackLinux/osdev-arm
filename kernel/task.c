@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <funcs.h>
 #include <support.h>
+#include <processor.h>
 
 static pcontext *pid_array[MAX_THREADS];
 
@@ -29,11 +30,13 @@ pcontext *get_pcb_with_pid(int id)
 	return 0;
 }
 
+
+
 void abyss()
 {
 	while (1) {
 		printk("In abyss moron = %s \n", get_current()->name);
-		schedule();
+	    panic("Check the code idiot\n"); 
 	}	
 	
 
@@ -53,8 +56,13 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
 	pcb->pc = (long)thread_fn;
 	pcb->lr = (long)abyss;
 	pcb->sp = (long)pcb->usr_stack_top;
-	pcb->cpsr = mode;
-	strncpy(pcb->name, name, TASK_NAME_SIZE);
+    pcb->cpsr = mode;
+    if ((mode & MODE_MASK) == SVC_MODE) {
+        pcb->lr = pcb->pc;
+//        pcb->cpsr = mode|0x80;
+    }
+            
+    strncpy(pcb->name, name, TASK_NAME_SIZE);
 	return pcb;	
 }
 int create_idle_thread(int (*thread_fn)(), const char *name, unsigned int mode)
@@ -85,9 +93,15 @@ int create_thread(int (*thread_fn)(), const char *name, unsigned mode)
 void sys_exit(int status)
 {
 	pcontext *pcb = get_current();
+    printk("Process: %d:%s exiting\n", pcb->pid, pcb->name);
 	if (pcb->pid == 0) {
 		panic("Killing init thread \n");
 	}
 	mark_pid(pcb->pid, 0);
 	remove_task(pcb, 1);
 }
+void sys_halt()
+{
+    while(1);
+}
+

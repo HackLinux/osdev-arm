@@ -1,5 +1,5 @@
 
-.global exit, sleep
+.global exit, sleep, halt
 
 exit:
 	push {lr}
@@ -13,3 +13,8 @@ sleep:
 	swi #1
 	pop {pc}
 
+halt:
+    push {lr}
+    mov lr, pc
+    swi #2
+    pop {pc}

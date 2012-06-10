@@ -49,9 +49,9 @@ int main()
 	scheduler_init();
 	mmu_init();	
 	
-	create_thread(normal_thread, "normal_thread", 0x110);
-	create_thread(normal_thread, "normal_thread1", 0x110);
-	create_thread(normal_thread1, "screw_up", 0x11f);
+	create_thread(normal_thread, "normal_thread", 0x193);
+	//create_thread(normal_thread, "normal_thread1", 0x110);
+	//create_thread(normal_thread1, "screw_up", 0x11f);
 	
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");
@@ -65,14 +65,7 @@ int main()
 	/* we shall never return here */
 	/* end of world */
 	
-	 __asm__ __volatile__("swi #10"::);
-	
-	printk("into user land\n");
-	
-	while(1) {
-		printk("sleep for 2 secs\n");
-		sleep(2000, 10);
-	}
+	panic("End of world, dude!\n");
 	return 0;
 }
 

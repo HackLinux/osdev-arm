@@ -16,6 +16,8 @@ int remove_from_rq(pcontext *pcb)
 
 int sys_sleep(long msecs)
 {
+    schedule();
+	return 1;
 	add_timer(msecs, wake_up_task, get_current());
 	remove_from_rq(get_current());
 	return 1;

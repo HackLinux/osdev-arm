@@ -8,6 +8,7 @@
 #define	SYS_MODE  0x1f
 #define	ABT_MODE  0x17
 #define UND_MODE  0x1b
+#define MODE_MASK 0X1f
 
 
 static inline void change_mode(int mode)

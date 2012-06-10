@@ -21,7 +21,7 @@
 	disable_cpsr_irq, disable_cpsr_fiq
 
 .global clear_hard_irq, clear_soft_irq
-
+.global disable_interrupts, enable_interrupts
 
 
 /* enable irq interrupts */
@@ -61,6 +61,12 @@ disable_interrupts:
 	bl disable_cpsr_irq
 	bl disable_cpsr_fiq	
 	pop {pc}
+
+enable_interrupts:
+    push {lr}
+    bl enable_cpsr_irq
+    bl enable_cpsr_fiq
+    pop {pc}
 
 /* we expect only one argument in r0, which contains the interrupt to enable
 r0 = interrupt to enable

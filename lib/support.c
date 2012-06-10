@@ -46,6 +46,6 @@ void hang()
 }
 void panic(char *str)
 {
-	printk(str);
-	hang();
+	printk("Panic ---> %s : %s\n", get_current()->name, str);
+	halt();
 }

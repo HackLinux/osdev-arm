@@ -30,7 +30,7 @@ int handle_generic_IRQ(int irq_status)
 		}
 	}
 			
-//	log_info(__func__);
+    /*log_info(__func__);*/
 	return irq_status;
 
 }

@@ -1,2 +1,14 @@
 each task should have its own stack pointer, important
 each mode will have their own stacks 
+
+1. when switching mode, manually, spsr will not change ->verify
+
+
+
+2. Schedule can be called in
+
+irq, system, svc
+
+when in irq, system or svc will not occur
+When in svc, irqs are disabled, so schedule will not be called
+When in sys, irq timer will be called and schedule, so disable irqs when entering schedule function in "sys mode"

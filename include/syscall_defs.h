@@ -2,4 +2,5 @@
 #define __SYSCALL_DEFS_H
 int sys_sleep(long microseconds);
 void sys_exit(int status);
+void sys_halt(void);
 #endif

@@ -6,6 +6,7 @@
 static long syscall_table[MAX_SYSCALL+1]= {
 	(long)sys_exit,
 	(long)sys_sleep,
+	(long)sys_halt,
 };
 
 

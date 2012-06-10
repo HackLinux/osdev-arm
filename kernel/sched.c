@@ -186,13 +186,13 @@ void schedule()
  	*  	3.1 save current task on thats task's kernel stack
  	*  	3.2 restore new task state from that task's kernel stack
  	*  	context switch
-	* will update  flag context_switch_req and sets cur_pcb_ptr, nxt_pcb_ptr  and will return
  	*/
+ 	//disable_interrupts();
 	unset_schedule_needed();
 	if (thread_count() == 1)
 		return;
 
-	printk("***********Context switch ************\n");
+    log_info_str("***********Context switch ************ %s\n", get_current()->name);
 	update_rq_ptrs();
 	
 	switch (get_cur_mode()) {
@@ -207,9 +207,11 @@ void schedule()
 
 	case SYS_MODE:
 		save_process_context_sys();
+	  //  enable_interrupts();
 		break;
 	default:
 		log_info_str("Invalid mode, got confused\n");
+		panic();
 		break;
 	} 
 	

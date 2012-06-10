@@ -50,7 +50,7 @@ int main()
 	mmu_init();	
 	
 	create_thread(normal_thread, "normal_thread", 0x193);
-	//create_thread(normal_thread, "normal_thread1", 0x110);
+	create_thread(normal_thread, "normal_thread1", 0x110);
 	//create_thread(normal_thread1, "screw_up", 0x11f);
 	
 

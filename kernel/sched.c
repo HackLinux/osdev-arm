@@ -195,7 +195,7 @@ void schedule()
 	if (thread_count() == 1)
 		return;
 
-    log_info_str("***********Context switch ************ %s, %d\n", get_current()->name, csw++);
+//    log_info_str("***********Context switch ************ %s, %d\n", get_current()->name, csw++);
 	update_rq_ptrs();
 	
 	switch (get_cur_mode()) {

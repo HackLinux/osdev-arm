@@ -3,43 +3,41 @@
 #include "syscall_api.h"
 
 void dump_regs();
+void print_debug(int i)
+{
+    log_info_str("Running %s: %d, stop = %x, jiffies = %d", get_task_name(), i++, get_stack_top(), get_jiffies());
+}
 
 
 int idle_thread()
 {
 //	set_stack_top(get_current()->usr_stack_top);
 	__asm__ __volatile__("mov sp, %0"::"r"(get_usr_stack()));
-	printk("In idle thread: %d\n", get_pid());
 	int i=100;
 	while (1) {
-//		log_info_str("Running %s: %d, stop = %x", get_task_name(), i++, get_stack_top());
+	    print_debug(i++);
         schedule();
-  //  	sleep(1);
+        hard_loop();
 	}
 	return 0;
 }
 int normal_thread()
 {
-	printk("running %d\n", get_pid());
 	int i = 20;
-	int stop;
 	while (1) {
-	//	log_info_str("Running %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, get_stack_top());
-	    sleep(10000);
+	    print_debug(i++);
+	    sleep(1000);
 	}
 	return 0;
 }
 
 int normal_thread1()
 {
-	printk("running %d\n", get_pid());
 	int i = 200;
-	int stop = 0;
-//	while (1) {
-		log_info_str("before schedule %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, stop);
-		schedule();
-		log_info_str("after schedule %s: pid = %d,%d, stop = %x", get_task_name(), get_pid(), i++, stop);
-//	}
+	while (1) {
+	    print_debug(i++);
+		sleep(5000);
+	}
 	exit(0);
 	return 0;
 }

@@ -32,7 +32,13 @@
 #define TIMER_SIZE_32  		(1 << 1)
 #define TIMER_ONE_SHOT  	(1 << 0)
 
-volatile static unsigned int jiffies = 0;
+volatile static unsigned long  jiffies = 0;
+
+unsigned long get_jiffies()
+{
+    return jiffies;
+}
+
 inline unsigned int get_timer_base(int index)
 {
 	switch (index) {

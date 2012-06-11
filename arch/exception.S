@@ -35,18 +35,22 @@ swi_vec:
 	stmfd sp,{r0-r14}^
 	sub sp, sp, #60
 	stmfd sp!, {lr}
+	
+	stmfd sp!, {r0-r6}               /*system call arguments */
+
 	# read the swi instruction
-	ldr r0, [lr, #-4]
+	ldr r11, [lr, #-4]                /* system call number */
+
 	# mask of the top 8 bits
-	bic r0, r0, #0xff000000
-# lets use r12 to get the base addr of syscall table
-	push {r0}
+	bic r11, r11, #0xff000000
+
 	mov lr,pc 
 	ldr pc,=get_syscall_base
-	mov r12, r0
-	pop {r0}
+	mov r12, r0                     /* system call base */
+
+	ldmfd sp!,{r0-r6}
 	mov lr, pc
-	ldr pc, [r12, r0, lsl #2]
+	ldr pc, [r12, r11, lsl #2]
 	ldmfd sp!, {lr}
 	ldmfd sp, {r0-r14}^
 	add sp, sp, #60

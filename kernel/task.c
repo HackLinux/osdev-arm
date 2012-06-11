@@ -59,6 +59,7 @@ pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, un
     pcb->cpsr = mode;
     if ((mode & MODE_MASK) == SVC_MODE) {
         pcb->lr = pcb->pc;
+	    pcb->sp = (long)pcb->svc_stack_top;
 //        pcb->cpsr = mode|0x80;
     }
             

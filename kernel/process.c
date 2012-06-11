@@ -15,7 +15,7 @@ int idle_thread()
 	__asm__ __volatile__("mov sp, %0"::"r"(get_usr_stack()));
 	int i=100;
 	while (1) {
-	    print_debug(i++);
+	    //print_debug(i++);
         schedule();
         hard_loop();
 	}

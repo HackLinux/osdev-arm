@@ -74,53 +74,63 @@ void print_timer_values(int count)
  */
 
 static timer_list *h_tm = 0;
-static volatile unsigned int rem_jiffies[20] = {0};
-int timers_cnt = 0;
+ /* jiffies -> number of clock ticks 
+ */ 
+#define INTRS_PER_SEC 10
+#define JIFFIES_IN_SEC INTRS_PER_SEC
+#define MSEC_PER_JIFFY (1000/JIFFIES_IN_SEC)
 
-#define HZ 1
-#define JIFFY 1000/HZ
 
+/*HZ is number of times scheduler called a sec*/
+#define HZ 5
+#define HZ_TO_JIFFIES (JIFFIES_IN_SEC/HZ) 
 
+#if HZ > JIFFIES_IN_SEC
+#error "HZ is greater than JIFFIES_PER_SEC"
+#endif
 
-/* jiffies -> number of clock ticks 
- * JIFFY   -> number of clock tics in a second
- * HZ is number of timer scheduler called a sec
- * Current scenerio HZ = 1, JIFFIES = 1
- */
 static long msecs_to_jiffies(long msecs)
 {
-	return (msecs + 999)/1000;
+	return (msecs + (MSEC_PER_JIFFY - 1))/(MSEC_PER_JIFFY);
 }
 
 
-int insert_timer(timer_list *tm)
+int insert_timer(timer_list *c_tm)
 {	
-	long msec_j = tm->jiffies;
+	long msec_j = c_tm->jiffies;
 
 	timer_list *t, *pt;
 
+    /*  h_tm : Pointer to the head of the timer list */
 	if (h_tm == 0) {
-		h_tm = tm;
+		h_tm = c_tm;
 		return 0;
 	}
-	
-	for (pt = h_tm, t = h_tm; t != 0; msec_j -= t->jiffies, pt = t, t = t->next) {
+	pt = h_tm;
+	for (t = h_tm; t != 0; t = t->next) {
+
 			if (msec_j < t->jiffies) {
+
 				if (t == h_tm) {
-					tm->next = h_tm;
-					h_tm = tm;	
+					c_tm->next = h_tm;
+					h_tm = c_tm;	
 				}
 				else {
-					pt->next = tm;
-					tm->next = t;	
+					pt->next = c_tm;
+					c_tm->next = t;	
 				}
-				tm->jiffies = msec_j;
-				for (t = tm->next; t != 0; t = t->next)
-					t->jiffies -= tm->jiffies;
+
+				c_tm->jiffies = msec_j;
+				
+				for (t = c_tm->next; t != 0; t = t->next)
+					t->jiffies -= c_tm->jiffies;
+				
 				return 0;
 			}
+			msec_j -= t->jiffies;
+			pt = t;
 	}
-	pt->next = tm;
+	pt->next = c_tm;
 	return 0;	
 }
 
@@ -162,7 +172,8 @@ int timer_handler(int irq, void *data)
 	tbase[TIMER_INTCLR] = 1;
 	jiffies++;
 	call_handlers();
-	set_schedule_needed();	
+	if (jiffies % (HZ_TO_JIFFIES) == 0)
+    	set_schedule_needed();	
 	return 0;
 }
 
@@ -193,7 +204,7 @@ void timer_init()
  */
 	/* set the timer for 10 ms */
 	/* 1000000 = 1 sec, 1 HZ */
-	timer_reload = (1 * 1000000)/(1 * 256 * HZ) ;//1 sec
+	timer_reload = (1 * 1000000)/(1 * 256 * INTRS_PER_SEC) ;//1 sec
 	timer_bg_reload = timer_reload;
 	tbase[TIMER_LOAD] = timer_reload;
 	tbase[TIMER_BGLOAD] = timer_bg_reload;

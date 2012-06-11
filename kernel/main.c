@@ -13,7 +13,7 @@ extern int bss_start;
 extern int bss_end;
 extern int mem_start;
 
-
+void serial_init();
 void arch_init();
 void timer_init();
 void mem_init();
@@ -43,6 +43,7 @@ int main()
     parse_args((const char *)QEMU_CMDLINE_ADDR);
     bss_init();
     arch_init();
+    serial_init();
     timer_init();
     mem_init(&mem_start, 10<<20); //ask to manage 10 MB
 

@@ -2,7 +2,7 @@
 
 
 includes 		= include lib
-CFLAGS    		= -mcpu=arm926ej-s -nostartfiles -fno-common -nostdinc -g $(addprefix -I, $(includes)) #-DDEBUG 
+CFLAGS    		= -mcpu=arm926ej-s -nostartfiles -fno-common -nostdinc -g $(addprefix -I, $(includes)) -Wall #-DDEBUG 
 CROSS_COMPILE   ?=  arm-none-linux-gnueabi-
 
 LINKER_DIR = linker

@@ -11,9 +11,16 @@ volatile unsigned int * const out_addr =  (unsigned int *)UART0_BASE_ADDR;
 
 #define UART0_IRQ 12
 
-int console_write(char *s)
+int console_write(unsigned char *s, int len)
 {
-	char *ptr = s;
+	unsigned char *ptr = s;
+	int i;
+	if (len != 0) {
+        for (i = 0; i < len; i++)
+            *out_addr = *s++;
+        return s - ptr;
+    }
+
 	while (*s) {
 		*out_addr = *s;	
 		s++;
@@ -25,9 +32,8 @@ int uart_handler(int irq, void *data)
 {
     unsigned char ch[2]={};
     ch[0] = *out_addr;
-    console_write(ch);
+    console_write(ch, 1);
     UART0_TICR = 1<<4;
-
 
 }
 

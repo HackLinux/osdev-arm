@@ -25,7 +25,8 @@ ap = (char *)((char *)&fmt + _arg_stack_size(&fmt));	\
 static char buf[1024] = {-1};
 static int ptr = -1;
 
-void console_write(char *);
+void console_write(char *, int len);
+int write_rbuf(char *buf, int len);
 /* valid base: 2, 8, 10 */
 static int parse_num(unsigned int value, unsigned int base) 
 {
@@ -200,7 +201,8 @@ char * printk(const char *fmt, ...)
 	}
 	buf[ptr] = '\0';
 	args_end(args);
+	write_rbuf(buf, ptr);
 	if (con_write_enabled)
-		console_write(buf);
+		console_write(buf, ptr);
 	return buf;
 }

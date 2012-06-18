@@ -143,6 +143,7 @@ int add_timer(long msecs, void (*call_back)(void *data), void *data)
 	tm->data = data;
 	tm->next = 0;
 	insert_timer(tm);
+	return 0;
 }
 
 int update_timer_list()
@@ -156,13 +157,13 @@ int update_timer_list()
 		kfree(h_tm);
 		h_tm = h_tm->next;
 	}
+	return 0;
 }
 
 
 
 void call_handlers()
 {
-	int i;
 	update_timer_list();
 }
 

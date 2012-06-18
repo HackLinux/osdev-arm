@@ -6,6 +6,7 @@ char * snprintk(const char *fmt, ...);
 
 void enable_con_write();
 void disable_con_write();
+int print_rbuf();
 #ifdef DEBUG 
 #define dprintk printk
 #else

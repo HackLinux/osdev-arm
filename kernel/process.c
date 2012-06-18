@@ -24,10 +24,15 @@ int idle_thread()
 int normal_thread()
 {
 	int i = 20;
+
+    sleep(5000);
+    disable_con_write();
 	while (1) {
 	    print_debug(i++);
 	    sleep(1000);
-	}
+	    print_rbuf();
+
+    }
 	return 0;
 }
 

@@ -27,6 +27,12 @@ inline long max(int a, int b)
 	return (a>b?a:b);
 }
 
+inline long abs(long value)
+{
+   if (value < 0)
+       value = -value;
+   return value;
+}
 #ifdef DEBUG
 int height_tree(buddy *n)
 {

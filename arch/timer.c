@@ -134,7 +134,7 @@ int insert_timer(timer_list *c_tm)
 	return 0;	
 }
 
-int add_timer(long msecs, void (*call_back)(void *data), void *data)
+int add_timer(long msecs, int (*call_back)(void *data), void *data)
 {
 	timer_list *tm = kmalloc(sizeof(timer_list));
 

@@ -1,9 +1,9 @@
-#include "funcs.h"
-#include "interrupt.h"
-#include "task.h"
-#include "processor.h"
-#include "print.h"
-#include "support.h"
+#include <funcs.h>
+#include <interrupt.h>
+#include <task.h>
+#include <processor.h>
+#include <print.h>
+#include <support.h>
 
 int print(char *s);
 void setup_idt();
@@ -17,6 +17,7 @@ void serial_init();
 void arch_init();
 void timer_init();
 void mem_init();
+void mmu_init();
 void scheduler_init();
 int idle_thread();
 int normal_thread();
@@ -52,8 +53,8 @@ int main()
     mmu_init();	
     
 	create_thread(normal_thread, "normal_thread", 0x193);
-	create_thread(normal_thread1, "normal_thread1", 0x110);
-	//create_thread(normal_thread1, "screw_up", 0x11f);
+//	create_thread(normal_thread, "normal_thread", 0x110);
+	create_thread(normal_thread1, "screw_up", 0x11f);
 	
 
 	__asm__ __volatile__("msr cpsr_c, #0x1f");

@@ -1,5 +1,5 @@
-#include "print.h"
-#include "interrupt.h"
+#include <print.h>
+#include <interrupt.h>
 
 //static intr_handler vect_h[MAX_IRQ];
 #define MAX_IRQ 32

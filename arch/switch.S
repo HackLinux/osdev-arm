@@ -123,7 +123,7 @@ restore_process_sys_regs:
 	ldr sp, =IRQ_STACK
 	movs pc, lr
 
-/* this function is called when a process is exited to restore prev task regs */
+/* this function is called when a process is switched to next task upon exit or sleep */
 switch_to_next_task:
 	ldr sp, =SVC_STACK
 	b restore_process_regs	

@@ -3,6 +3,7 @@
 #include <print.h>
 #include <processor.h>
 #include <support.h>
+#include <malloc.h>
 
 
 pcontext *cur_pcb_ptr, *nxt_pcb_ptr;
@@ -10,7 +11,14 @@ static int sched_needed;
 
 extern void context_switch();
 extern int get_cpsr();
+extern void switch_to_next_task();
 
+
+extern void enable_interrupts();
+extern void disable_interrupts();
+extern void save_process_context_in_irq();
+extern void save_process_context_svc();
+extern void save_process_context_sys();
 
 static pcontext *cur_pcb 	= 0;
 static pcontext *head 		= 0;
@@ -146,8 +154,19 @@ int insert_task(pcontext *pcb)
 	h->prev = pcb;
 	set_task_list_tail(pcb);
 	inc_thread_count();
+	return 0;
 }
 
+/*  Bit of black magic here,
+ *  schedule just switches tasks, and it should have valid cur and next task ptrs
+ *  Now we are not removing the cur task from rq and not moving the cur ptr
+ *  but updating prev and nxt ptr values,
+ *
+ * This is has very interesting side effect, we just call schedule, which
+ * see cur task and nxt task ptrs and goes on magically, but on nxt switch,
+ * this task in no longer on runqueue.
+ *  
+ */
 
 int remove_task(pcontext *pcb, int free_pcb)
 {
@@ -156,18 +175,21 @@ int remove_task(pcontext *pcb, int free_pcb)
 	n = pcb->next;
 	p->next = n;
 	n->prev = p;
-	pcb->next = pcb->prev = 0;
+	
 	if (get_task_list_tail() == pcb) 
 		set_task_list_tail(p);
 
 	dec_thread_count();
-	set_current(p);
 	update_rq_ptrs();
-	if (free_pcb)
+	if (free_pcb) {
 		kfree(pcb);
-
-	switch_to_next_task();
-
+		set_current(p);
+        switch_to_next_task();      //when freeing things , no need to save cur reg set 
+	}else {
+        schedule(); 
+    }                               //just call schedule, to come back, screw up here
+                                    // cur pcb is no longer valid here, bcoz we are removing boss, fix it 
+    return 0;
 }
 
 void init_runq(pcontext *pcb)
@@ -179,7 +201,7 @@ void init_runq(pcontext *pcb)
 
 void schedule()
 {
-    static int csw = 0;
+//    static int csw = 0;
 //	printk("scheduler called \n");
 	/* 1. num of ready tasks == 1 , i.e idle thread running, so dont bother, return back
  	*  2. num of ready taks > 1, round robin, pick next task
@@ -215,7 +237,7 @@ void schedule()
 
 	default:
 		log_info_str("Invalid mode, got confused\n");
-		panic();
+		panic("panic");
 		break;
 	} 
 	

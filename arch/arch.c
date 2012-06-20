@@ -1,6 +1,6 @@
-#include "funcs.h"
-#include "print.h"
-#include "interrupt.h"
+#include <funcs.h>
+#include <print.h>
+#include <interrupt.h>
 extern unsigned char __idt_start, __idt_end;
 
 volatile unsigned char *exception_table = 0x0;

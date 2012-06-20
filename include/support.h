@@ -22,13 +22,18 @@ char *get_cpsr_info(void);
 #define USR	10000
 
 static char str_mode[][4]      = {"", "abt", "fiq",  "irq", "svc", "sys", "und", "usr"};
-static char modes[4][4]         = {
+static int  modes[4][4]         = {
                         {7, 0, 0, 0},
                         {2, 0, 0, 0},
                         {3, 0, 0, 0},
                         {4, 1, 6, 5},
                         };
-
-#define print_mode(m) str_mode[modes[(m)&0x3][((m)&0xc)>>2]]
+static inline char *print_mode(int m)
+{
+    return str_mode[modes[(m)&0x3][((m)&0xc)>>2]];
+}
 #define get_mode(m) ((m)&0x1f)
+
+void hard_loop();
+void panic(char *);
 #endif

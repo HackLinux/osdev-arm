@@ -34,7 +34,7 @@ int uart_handler(int irq, void *data)
     ch[0] = *out_addr;
     console_write(ch, 1);
     UART0_TICR = 1<<4;
-
+    return 0;
 }
 
 void serial_init()

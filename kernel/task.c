@@ -45,7 +45,6 @@ void abyss()
 pcontext *common_thread_create(int pid, int (*thread_fn)(), const char *name, unsigned int mode)
 {
 	pcontext *pcb;
-	unsigned int pcb_sz;
 	
 	if (thread_count() > MAX_THREADS)
 		return 0;

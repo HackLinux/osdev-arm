@@ -1,4 +1,4 @@
-#include "funcs.h"
+#include <funcs.h>
 
 void *memset(void *a, int ch, size_t sz)
 {

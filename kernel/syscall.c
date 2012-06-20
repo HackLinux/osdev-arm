@@ -1,6 +1,6 @@
-#include "print.h"
-#include "support.h"
-#include "syscall_tbl.h"
+#include <print.h>
+#include <support.h>
+#include <syscall_tbl.h>
 int a = 0x12345;
 
 int console_write(const char *);

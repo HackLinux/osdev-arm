@@ -8,9 +8,9 @@ void enable_con_write();
 void disable_con_write();
 int print_rbuf();
 #ifdef DEBUG 
-#define dprintk printk
+#define dprintk(fmt, args...) printk(fmt, ##VA_ARGS_
 #else
-#define dprintk 
-#endif
+#define dprintk(fmt, args...) 
+#endif                   
 
 #endif

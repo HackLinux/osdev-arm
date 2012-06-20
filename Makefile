@@ -2,7 +2,8 @@
 
 
 includes 		= include lib
-CFLAGS    		= -mcpu=arm926ej-s -nostartfiles -fno-common -nostdinc -g $(addprefix -I, $(includes)) -Wall #-DDEBUG 
+COMPILE_FLAGS	=  -Wall -Werror -Wno-nonnull
+CFLAGS    		= -mcpu=arm926ej-s -nostartfiles -fno-common -nostdinc -g $(addprefix -I, $(includes)) $(COMPILE_FLAGS) #-DDEBUG 
 CROSS_COMPILE   ?=  arm-none-linux-gnueabi-
 
 LINKER_DIR = linker
@@ -32,12 +33,12 @@ $(shell mkdir -p $(objdir); mkdir -p $(depend);echo > $(logfile))
 
 
 
-tgt := final
+tgt := ker
 
 $(tgt): $(objs)
 	@echo ; 
 	echo "Generating kernel image" ; 
-	$(CROSS_COMPILE)gcc $(objs) -o $@ -Wl,-T $(LINKER_DIR)/ld.script -Wl,-M -nostdlib  $(CFLAGS) > final.map ;\
+	$(CROSS_COMPILE)gcc $(objs) -o $@ -Wl,-T $(LINKER_DIR)/ld.script -Wl,-M -nostdlib  $(CFLAGS) > $(tgt).map ;\
 	$(CROSS_COMPILE)objcopy -O binary $@ $@.bin
 
 
@@ -80,7 +81,7 @@ cscope:
 	cscope -b -k -q
 
 clean:
-	rm -rf $(objdir) final final.bin final.map
+	rm -rf $(objdir) $(tgt) $(tgt).map $(tgt).bin
 	
 
 clean_cscope:

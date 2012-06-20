@@ -20,8 +20,11 @@
 
 typedef struct timer_list {
 		long jiffies;
-		void (*func)(void *);
+		int (*func)(void *);
 		void *data;
 		struct timer_list *next;
 }timer_list;
+unsigned long get_jiffies(void);
+int add_timer(long msecs, int (*call_back)(void *data), void *data);
+
 #endif

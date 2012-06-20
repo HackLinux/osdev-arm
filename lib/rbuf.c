@@ -10,12 +10,12 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  sahithi
+ *         Author:  sahithi: sahithi.cse@gmail.com
  *   Organization:  
  *
  * =====================================================================================
  */
-#include "funcs.h"
+#include <funcs.h>
 
 #define MAX_RBUF_LEN         256
 
@@ -23,8 +23,9 @@ static char ringbuf[MAX_RBUF_LEN];
 static int r_st  = 0;
 static int r_end = 1;
 
+int console_write(char *, int len);
 int write_ring_buf(char *rbuf, char *ubuf, unsigned int ulen);
-static int copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *ubuf, unsigned int ulen);
+static void copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *ubuf, unsigned int ulen);
 
 void print_rbuf(char *dbuf)
 {   
@@ -59,16 +60,17 @@ int write_rbuf(char *ubuf, unsigned int ulen)
 
     r_nend = (r_end + ulen) % MAX_RBUF_LEN;
 
+    /* (r_st <= r_next_end < r_end)  || (r_next_end < r_end < r_st ) || (r_end < r_st <= r_next_end) */
     if ((r_st <= r_nend && r_end > r_nend) || ((r_st > r_end) && (r_nend >= r_st || r_nend < r_end)))
         r_st = (r_nend + 1)%MAX_RBUF_LEN;
 
 
     copy_data(rbuf, r_end, r_nend, ubuf, ulen);
     r_end = r_nend;
-
+    return ulen;
 }
 
-static int copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *ubuf, unsigned int ulen)
+static void copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *ubuf, unsigned int ulen)
 {
     unsigned int end1 = 0, end2 = 0;
 

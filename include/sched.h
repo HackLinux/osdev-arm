@@ -25,4 +25,6 @@ int get_cur_mode();
 void update_rq_ptrs();
 void schedule(void);
 void scheduler_init(void);
+int insert_task(pcontext *);
+int remove_task(pcontext *, int free);
 #endif

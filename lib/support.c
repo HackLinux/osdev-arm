@@ -1,7 +1,7 @@
-#include "funcs.h"
-#include "print.h"
-#include "support.h"
-#include "task.h"
+#include <funcs.h>
+#include <print.h>
+#include <support.h>
+#include <task.h>
 
 	 
 static char buf[120];

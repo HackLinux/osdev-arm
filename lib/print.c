@@ -1,6 +1,6 @@
 //#include "print.h"
-#include "stdarg.h"
-#include "funcs.h"
+#include <stdarg.h>
+#include <funcs.h>
 #if 0
 #define args_list char *
 
@@ -154,7 +154,7 @@ char * printk(const char *fmt, ...)
 		}
 		i++;
 		int field_width = 0;
-		int width;
+//		int width;
 		int fw = 0;
 		while (is_digit(fmt[i]))
 			fw = 10 * fw + fmt[i++] - '0';

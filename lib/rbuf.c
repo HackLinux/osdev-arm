@@ -16,8 +16,11 @@
  * =====================================================================================
  */
 #include <funcs.h>
-
-#define MAX_RBUF_LEN         256
+#if 0
+#include <stdlib.h>
+#include <string.h>
+#endif
+#define MAX_RBUF_LEN         1024
 
 static char ringbuf[MAX_RBUF_LEN];
 static int r_st  = 0;
@@ -27,8 +30,15 @@ int console_write(char *, int len);
 int write_ring_buf(char *rbuf, char *ubuf, unsigned int ulen);
 static void copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *ubuf, unsigned int ulen);
 
-void print_rbuf(char *dbuf)
+#if 0
+int console_write(char *buf, int len)
+{
+    write(1, buf, len);
+}
+#endif
+void print_rbuf()
 {   
+    char *dbuf = ringbuf;
     unsigned int end1 = 0, end2 = 0;
     
     if (r_st < r_end) {
@@ -84,3 +94,14 @@ static void copy_data(char *dbuf, unsigned int d_st, unsigned int d_end, char *u
         memcpy(dbuf, ubuf + end1, end2);
     }
 }
+#if 0
+int main()
+{
+    char line[1024];
+    while (1) {
+        gets(line);
+        write_rbuf(line, strlen(line));
+        print_rbuf();
+    }
+}
+#endif

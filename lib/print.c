@@ -201,8 +201,8 @@ char * printk(const char *fmt, ...)
 	}
 	buf[ptr] = '\0';
 	args_end(args);
-	write_rbuf(buf, ptr);
+	write_rbuf(buf, ptr+1);
 	if (con_write_enabled)
-		console_write(buf, ptr);
+		console_write(buf, ptr+1);
 	return buf;
 }
